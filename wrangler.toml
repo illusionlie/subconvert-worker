@@ -1,0 +1,3 @@
+name = "subconverter-worker"
+main = "_worker.js"
+compatibility_date = "2025-07-11"

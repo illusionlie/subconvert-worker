@@ -1,0 +1,23 @@
+# Vless (v2ray)
+vless://<id>@<address>:<port>?encryption=none&flow=<Optional flow>>&security=<tls, reality, none>&sni=<Optional sni>&alpn=<Optional alpn>&fp=<chrome, firefox, safari, random, none>&allowInsecure=<1 0>&type=<ws, h2, grpc, tcp>&host=<Optional host>&path=<Optional path>#<remarks>
+
+# Vless (Clash Meta)
+- name: <remarks>
+  type: vless
+  server: <address>
+  port: <port>
+  uuid: <id>
+  flow: <Optional flow>
+  packetEncoding: <packetaddr xudp none>
+  tls: <true or false>
+  servername: <sni>
+  alpn:
+    - <Optional alpn>
+  fingerprint: ''
+  client-fingerprint: <chrome, firefox, safari, ios, android, edge, 360, qq, random>
+  skip-cert-verify: <true or false>
+  network: <ws, h2, grpc, tcp>
+  ws-opts:
+    path: <Optional path>
+    headers:
+      Host: <Optional host>
