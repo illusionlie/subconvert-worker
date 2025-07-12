@@ -29,6 +29,12 @@ export async function handleSubRequest(request, env, ctx) {
         suburl = "https://subpool.illusionlie.com/testtoken?clash";
     }
 
+    console.log(`
+        SubConverter:
+        Target: ${target}
+        SubURL: ${suburl}
+        `);
+
     const subresponse = await fetch(suburl, { headers: requestHeaders });
     const substr = await subresponse.text();
   
@@ -50,7 +56,7 @@ export async function handleSubRequest(request, env, ctx) {
             return createResponse(substr, 200, {}, 'application/json');
         } else {
             // Clash to V2ray
-            const v2rayConfig = convertClashToV2ray(substr);
+            const { v2rayConfig, nodeCounter, convertCounter } = convertClashToV2ray(substr);
             return createResponse(v2rayConfig, 200, {}, 'application/json');
         }
     }

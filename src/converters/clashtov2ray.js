@@ -11,32 +11,40 @@ export function convertClashToV2ray(clashConfig) {
     const config = yaml.load(clashConfig);
     const proxies = config.proxies;
     const v2rayLinks = [];
+    let nodeCounter = 0;
+    let convertCounter = 0;
 
     if (proxies) {
         for (const proxy of proxies) {
+            nodeCounter++;
             let link = '';
             switch (proxy.type) {
                 case 'vmess':
-                    link = convertVmessToV2ray(proxy);
+                    link = convertVmess(proxy);
                     break;
                 case 'ss':
-                    link = convertSsToV2ray(proxy);
+                    link = convertSs(proxy);
                     break;
                 case 'trojan':
-                    link = convertTrojanToV2ray(proxy);
+                    link = convertTrojan(proxy);
                     break;
                 case 'vless':
-                    link = convertVlessToV2ray(proxy);
+                    link = convertVless(proxy);
                     break;
                 // TODO: Add support for other proxy types
             }
             if (link) {
+                convertCounter++;
                 v2rayLinks.push(link);
             }
         }
     }
 
-    return safeBtoa(v2rayLinks.join('\n'));
+    return {
+        v2rayConfig: safeBtoa(v2rayLinks.join('\n')),
+        nodeCounter: nodeCounter,
+        convertCounter: convertCounter
+    };
 }
 
 /**
@@ -44,7 +52,7 @@ export function convertClashToV2ray(clashConfig) {
  * @param {object} proxy - Clash Vmess 配置。
  * @returns {string} V2ray 链接。
  */
-function convertVmessToV2ray(proxy) {
+function convertVmess(proxy) {
     const vmessConfig = [
         'v=2',
         `ps=${decodeURIComponent(proxy.name)}`,
@@ -53,12 +61,12 @@ function convertVmessToV2ray(proxy) {
         `id=${proxy.uuid}`,
         `aid=${proxy.alterId}`,
         `scy=${proxy.cipher}`,
-        `net=${proxy.network}`,
+        `net=${['tcp', 'ws', 'h2'].includes(proxy.network) ? proxy.network : 'tcp'}`,
         `type=${proxy.type}`,
-        `host=${proxy['ws-opts']?.headers?.Host || ''}`,
-        `path=${proxy['ws-opts']?.path || ''}`,
-        `tls=${proxy.tls ? 'tls' : ''}`,
-        `sni=${proxy.sni || proxy.servername || ''}`,
+        proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
+        proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
+        proxy.tls && `tls=${proxy.tls ? 'tls' : ''}`,
+        proxy.tls && `sni=${proxy.sni || proxy.servername || ''}`,
         proxy.alpn && `alpn=${proxy.alpn}`,
         proxy['client-fingerprint'] && `fp=${proxy['client-fingerprint']}`
     ];
@@ -75,7 +83,7 @@ function convertVmessToV2ray(proxy) {
  * @param {object} proxy - Clash VLESS 配置。
  * @returns {string} V2ray 链接。
  */
-function convertVlessToV2ray(proxy) {
+function convertVless(proxy) {
 const vlessConfig = [
     proxy.uuid + '@' + proxy.server + ':' + proxy.port + '?encryption=none',
     proxy.flow && `&flow=${proxy.flow}`,
@@ -85,7 +93,8 @@ const vlessConfig = [
     proxy['client-fingerprint'] && `&fp=${proxy['client-fingerprint']}`,
     proxy['skip-cert-verify'] && `&allowInsecure=true`,
     `&type=${proxy.network}`,
-    proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`
+    proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
+    proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
 ]
 return 'vless://' + vlessConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
 }
@@ -94,7 +103,7 @@ return 'vless://' + vlessConfig.filter(Boolean).join('') + '#' + encodeURICompon
  * @param {object} proxy - Clash Shadowsocks 配置。
  * @returns {string} V2ray 链接。
  */
-function convertSsToV2ray(proxy) {
+function convertSs(proxy) {
     const encoded = safeBtoa(`${proxy.cipher}:${proxy.password}`);
     return `ss://${encoded}@${proxy.server}:${proxy.port}#${encodeURIComponent(proxy.name)}`;
 }
@@ -104,9 +113,19 @@ function convertSsToV2ray(proxy) {
  * @param {object} proxy - Clash Trojan 配置。
  * @returns {string} V2ray 链接。
  */
-function convertTrojanToV2ray(proxy) {
-    const sni = proxy['sni'] || proxy['server-name'] || '';
-    return `trojan://${proxy.password}@${proxy.server}:${proxy.port}?sni=${sni}#${encodeURIComponent(proxy.name)}`;
+function convertTrojan(proxy) {
+    const trojanConfig = [
+        proxy.password + '@' + proxy.server + ':' + proxy.port,
+        `?type=${proxy.network}`,
+        proxy.tls && `&security=tls`,
+        proxy.servername && `&sni=${proxy.servername}`,
+        proxy.alpn && `&alpn=${proxy.alpn}`,
+        proxy['client-fingerprint'] && `&fp=${proxy['client-fingerprint']}`,
+        proxy['skip-cert-verify'] && `&allowInsecure=1`,        
+        proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
+        proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
+    ];
+    return 'trojan://' + trojanConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
 }
 
 /**
@@ -114,7 +133,7 @@ function convertTrojanToV2ray(proxy) {
  * @param {object} proxy - Clash Hysteria2 配置。
  * @returns {string} V2ray 链接。
  */
-function convertHysteria2ToV2ray(proxy) {
+function convertHysteria2(proxy) {
     const hysteriaConfig = {
         protocol: 'hysteria2',
         server: proxy.server,
