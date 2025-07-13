@@ -57,7 +57,7 @@ export async function handleSubRequest(request, env, ctx) {
         } else {
             // Clash to V2ray
             const { v2rayConfig, nodeCounter, convertCounter } = convertClashToV2ray(substr);
-            return createResponse(v2rayConfig, 200, {}, 'application/json');
+            return createResponse(v2rayConfig, 200, {}, 'text/plain');
         }
     }
 

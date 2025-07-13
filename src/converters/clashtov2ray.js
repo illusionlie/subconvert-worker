@@ -22,14 +22,17 @@ export function convertClashToV2ray(clashConfig) {
                 case 'vmess':
                     link = convertVmess(proxy);
                     break;
+                case 'vless':
+                    link = convertVless(proxy);
+                    break;
                 case 'ss':
                     link = convertSs(proxy);
                     break;
                 case 'trojan':
                     link = convertTrojan(proxy);
                     break;
-                case 'vless':
-                    link = convertVless(proxy);
+                case 'hysteria2':
+                    link = convertHysteria2(proxy);
                     break;
                 // TODO: Add support for other proxy types
             }
@@ -39,7 +42,7 @@ export function convertClashToV2ray(clashConfig) {
             }
         }
     }
-
+    console.log("nodeCounter: " + nodeCounter + ", convertCounter: " + convertCounter);
     return {
         v2rayConfig: safeBtoa(v2rayLinks.join('\n')),
         nodeCounter: nodeCounter,
@@ -61,12 +64,16 @@ function convertVmess(proxy) {
         `id=${proxy.uuid}`,
         `aid=${proxy.alterId}`,
         `scy=${proxy.cipher}`,
-        `net=${['tcp', 'ws', 'h2'].includes(proxy.network) ? proxy.network : 'tcp'}`,
+        `net=${['tcp', 'ws', 'h2', 'grpc'].includes(proxy.network) ? proxy.network : 'tcp'}`,
         `type=${proxy.type}`,
-        proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
-        proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
-        proxy.tls && `tls=${proxy.tls ? 'tls' : ''}`,
-        proxy.tls && `sni=${proxy.sni || proxy.servername || ''}`,
+        proxy.network === 'ws' && proxy['ws-opts'] && `host=${proxy['ws-opts'].headers?.Host || ''}`,
+        proxy.network === 'ws' && proxy['ws-opts'] && `path=${proxy['ws-opts'].path || ''}`,
+        proxy.network === 'h2' && proxy['h2-opts'] && `host=${proxy['h2-opts'].host || ''}`,
+        proxy.network === 'h2' && proxy['h2-opts'] && `path=${proxy['h2-opts'].path || ''}`,
+        proxy.network === 'grpc' && proxy['grpc-opts'] && `serviceName=${proxy['grpc-opts']['grpc-service-name'] || ''}`,
+        proxy.network === 'grpc' && proxy['grpc-opts'] && `mode=gun`,
+        proxy.tls === true && `tls=tls`,
+        (proxy.sni || proxy.servername) && `sni=${proxy.servername || proxy.sni}`,
         proxy.alpn && `alpn=${proxy.alpn}`,
         proxy['client-fingerprint'] && `fp=${proxy['client-fingerprint']}`
     ];
@@ -75,7 +82,9 @@ function convertVmess(proxy) {
         const [key, value] = item.split('=');
         vmess[key] = value;
     });
-    return 'vmess://' + safeBtoa(JSON.stringify(vmess));
+    const result = 'vmess://' + safeBtoa(JSON.stringify(vmess));
+    console.log(vmess);
+    return result;
 }
 
 /**
@@ -84,19 +93,23 @@ function convertVmess(proxy) {
  * @returns {string} V2ray 链接。
  */
 function convertVless(proxy) {
-const vlessConfig = [
-    proxy.uuid + '@' + proxy.server + ':' + proxy.port + '?encryption=none',
-    proxy.flow && `&flow=${proxy.flow}`,
-    proxy.tls && `&security=tls`,
-    proxy.servername && `&sni=${proxy.servername}`,
-    proxy.alpn && `&alpn=${proxy.alpn}`,
-    proxy['client-fingerprint'] && `&fp=${proxy['client-fingerprint']}`,
-    proxy['skip-cert-verify'] && `&allowInsecure=true`,
-    `&type=${proxy.network}`,
-    proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
-    proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
-]
-return 'vless://' + vlessConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
+    const vlessConfig = [
+        proxy.uuid + '@' + proxy.server + ':' + proxy.port + '?encryption=none',
+        proxy.flow && `&flow=${proxy.flow}`,
+        proxy.tls === true ? (proxy['reality-opts'] ? '&security=reality' : '&security=tls') : '',
+        proxy.tls === true && proxy['reality-opts'] && `&pbk=${proxy['reality-opts']['public-key']}&sid=${proxy['reality-opts']['short-id']}`,
+        (proxy.sni || proxy.servername) && `&sni=${proxy.servername || proxy.sni}`,
+        proxy.alpn && `&alpn=${proxy.alpn}`,
+        proxy['client-fingerprint'] && `&fp=${proxy['client-fingerprint']}`,
+        proxy['skip-cert-verify'] === true && `&allowInsecure=true`,
+        `&type=${['tcp', 'ws', 'h2', 'grpc'].includes(proxy.network) ? proxy.network : 'tcp'}`,
+        proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
+        proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
+        proxy.network === 'grpc' && proxy['grpc-opts'] && `&serviceName=${proxy['grpc-opts']['grpc-service-name'] || ''}&mode=gun`,
+    ]
+    const result = 'vless://' + vlessConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
+    console.log(result);
+    return result;
 }
 /**
  * 将 Clash Shadowsocks 配置转换为 V2ray 链接。
@@ -104,8 +117,13 @@ return 'vless://' + vlessConfig.filter(Boolean).join('') + '#' + encodeURICompon
  * @returns {string} V2ray 链接。
  */
 function convertSs(proxy) {
-    const encoded = safeBtoa(`${proxy.cipher}:${proxy.password}`);
-    return `ss://${encoded}@${proxy.server}:${proxy.port}#${encodeURIComponent(proxy.name)}`;
+    const ssConfig = [
+        safeBtoa(`${proxy.cipher}:${proxy.password}`) + '@' + proxy.server + ':' + proxy.port,
+        `#${encodeURIComponent(proxy.name)}`
+    ];
+    const result = 'ss://' + ssConfig.filter(Boolean).join('');
+    console.log(result);
+    return result;
 }
 
 /**
@@ -116,16 +134,20 @@ function convertSs(proxy) {
 function convertTrojan(proxy) {
     const trojanConfig = [
         proxy.password + '@' + proxy.server + ':' + proxy.port,
-        `?type=${proxy.network}`,
-        proxy.tls && `&security=tls`,
-        proxy.servername && `&sni=${proxy.servername}`,
+        `?type=${['tcp', 'ws', 'h2', 'grpc'].includes(proxy.network) ? proxy.network : 'tcp'}`,
+        proxy.tls === true ? (proxy['reality-opts'] ? '&security=reality' : '&security=tls') : '',
+        proxy.tls === true && proxy['reality-opts'] && `&pbk=${proxy['reality-opts']['public-key']}&sid=${proxy['reality-opts']['short-id']}`,
+        (proxy.sni || proxy.servername) && `&sni=${proxy.servername || proxy.sni}`,
         proxy.alpn && `&alpn=${proxy.alpn}`,
         proxy['client-fingerprint'] && `&fp=${proxy['client-fingerprint']}`,
-        proxy['skip-cert-verify'] && `&allowInsecure=1`,        
+        proxy['skip-cert-verify'] === true && `&allowInsecure=1`,        
         proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
         proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
+        proxy.network === 'grpc' && proxy['grpc-opts'] && `&serviceName=${proxy['grpc-opts']['grpc-service-name'] || ''}&mode=gun`
     ];
-    return 'trojan://' + trojanConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
+    const result = 'trojan://' + trojanConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
+    console.log(result);
+    return result;
 }
 
 /**
@@ -134,15 +156,17 @@ function convertTrojan(proxy) {
  * @returns {string} V2ray 链接。
  */
 function convertHysteria2(proxy) {
-    const hysteriaConfig = {
-        protocol: 'hysteria2',
-        server: proxy.server,
-        port: proxy.port,
-        auth_str: proxy.password,
-        alpn: proxy.alpn,
-        sni: proxy.sni,
-        skip_cert_verify: proxy.skipCertVerify
-    };
-
-    return 'hysteria2://' + safeBtoa(JSON.stringify(hysteriaConfig));
+    const hysteriaConfig = [
+        proxy.password + '@' + proxy.server + ':' + proxy.port + '?',
+        proxy.sni || proxy.servername && `sni=${proxy.servername}&`,
+        proxy.alpn && `alpn=${proxy.alpn}&`,
+        proxy.obfs && `obfs=${proxy.obfs}&`,
+        proxy['obfs-password'] && `obfs-password=${proxy['obfs-password']}&`,
+        proxy.ports && `mport=${proxy.ports}&`,
+        // proxy['client-fingerprint'] && `fp=${proxy['client-fingerprint']}&`,
+        proxy['skip-cert-verify'] === true && `allowInsecure=1`,
+    ];
+    const result = 'hysteria2://' + hysteriaConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
+    console.log(result);
+    return result;
 }
