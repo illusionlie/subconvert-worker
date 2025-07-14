@@ -34,6 +34,9 @@ export function convertClashToV2ray(clashConfig) {
                 case 'hysteria2':
                     link = convertHysteria2(proxy);
                     break;
+                case 'tuic':
+                    link = convertTuic(proxy);
+                    break;
                 // TODO: Add support for other proxy types
             }
             if (link) {
@@ -167,6 +170,25 @@ function convertHysteria2(proxy) {
         proxy['skip-cert-verify'] === true && `allowInsecure=1`,
     ];
     const result = 'hysteria2://' + hysteriaConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
+    console.log(result);
+    return result;
+}
+
+/**
+ * 将 Clash TUIC 配置转换为 V2ray 链接。
+ * @param {object} proxy - Clash TUIC 配置。
+ * @returns {string} V2ray 链接。
+ */
+function convertTuic(proxy) {
+    // TUIC V4 Not Supported
+    if (proxy.token) return;
+    const tuicConfig = [
+        proxy.uuid + ':' + proxy.password + '@' + (proxy.ip ? proxy.ip : proxy.server) + ':' + proxy.port + '?',
+        proxy['disable-sni'] !== true && (proxy.sni || proxy.servername) && `sni=${proxy.servername || proxy.sni}&`,
+        proxy.alpn && `alpn=${proxy.alpn}&`,
+        proxy['congestion-controller'] && `congestion_control=${proxy['congestion-controller']}&`,
+    ];
+    const result = 'tuic://' + tuicConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
     console.log(result);
     return result;
 }
