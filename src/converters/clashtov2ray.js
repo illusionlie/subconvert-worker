@@ -111,39 +111,6 @@ export function convertClashToV2ray(clashConfig) {
  * @param {object} proxy - Clash Vmess 配置。
  * @returns {string} V2ray 链接。
  */
-/*
-function convertVmess(proxy) {
-    const vmessConfig = [
-        'v=2',
-        `ps=${proxy.name}`,
-        `add=${proxy.server}`,
-        `port=${proxy.port}`,
-        `id=${proxy.uuid}`,
-        `aid=${proxy.alterId}`,
-        `scy=${proxy.cipher || 'auto'}`,
-        `net=${['tcp', 'ws', 'h2', 'grpc'].includes(proxy.network) ? proxy.network : 'tcp'}`,
-        `type=none`,
-        proxy.network === 'ws' && proxy['ws-opts'] && `host=${proxy['ws-opts'].headers?.Host || ''}`,
-        proxy.network === 'ws' && proxy['ws-opts'] && `path=${proxy['ws-opts'].path || ''}`,
-        proxy.network === 'h2' && proxy['h2-opts'] && `host=${proxy['h2-opts'].host || ''}`,
-        proxy.network === 'h2' && proxy['h2-opts'] && `path=${proxy['h2-opts'].path || ''}`,
-        proxy.network === 'grpc' && proxy['grpc-opts'] && `serviceName=${proxy['grpc-opts']['grpc-service-name'] || ''}`,
-        proxy.network === 'grpc' && proxy['grpc-opts'] && `mode=gun`,
-        proxy.tls === true && `tls=tls`,
-        (proxy.sni || proxy.servername) && `sni=${proxy.servername || proxy.sni}`,
-        proxy.alpn && `alpn=${proxy.alpn}`,
-        proxy['client-fingerprint'] && `fp=${proxy['client-fingerprint']}`
-    ];
-    let vmess = {};
-    vmessConfig.filter(Boolean).forEach(item => {
-        const [key, value] = item.split('=');
-        vmess[key] = value;
-    });
-    const result = 'vmess://' + safeBtoa(JSON.stringify(vmess));
-    console.log(vmess);
-    return result;
-}
-*/
 function convertVmess(proxy) {
     if (!proxy || !proxy.name || !proxy.server || proxy.port == null || !proxy.uuid || proxy.alterId == null) {
         console.error("无法生成 URI: 代理对象缺少核心属性。");
@@ -230,27 +197,6 @@ function convertVmess(proxy) {
  * @param {object} proxy - Clash VLESS 配置。
  * @returns {string} V2ray 链接。
  */
-/*
-function convertVless(proxy) {
-    const vlessConfig = [
-        proxy.uuid + '@' + proxy.server + ':' + proxy.port + '?encryption=none',
-        proxy.flow && `&flow=${proxy.flow}`,
-        proxy.tls === true ? (proxy['reality-opts'] ? '&security=reality' : '&security=tls') : '',
-        proxy.tls === true && proxy['reality-opts'] && `&pbk=${proxy['reality-opts']['public-key']}&sid=${proxy['reality-opts']['short-id']}`,
-        (proxy.sni || proxy.servername) && `&sni=${proxy.servername || proxy.sni}`,
-        proxy.alpn && `&alpn=${proxy.alpn}`,
-        proxy['client-fingerprint'] && `&fp=${proxy['client-fingerprint']}`,
-        proxy['skip-cert-verify'] === true && `&allowInsecure=true`,
-        `&type=${['tcp', 'ws', 'h2', 'grpc'].includes(proxy.network) ? proxy.network : 'tcp'}`,
-        proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
-        proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
-        proxy.network === 'grpc' && proxy['grpc-opts'] && `&serviceName=${proxy['grpc-opts']['grpc-service-name'] || ''}&mode=gun`,
-    ]
-    const result = 'vless://' + vlessConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
-    console.log(result);
-    return result;
-}
-*/
 function convertVless(proxy) {
     if (!proxy || !proxy.server || !proxy.port || !proxy.uuid || !proxy.name) {
         console.error("无法生成 URI: 代理对象缺少核心属性。");
@@ -300,26 +246,6 @@ function convertSs(proxy) {
  * @param {object} proxy - Clash Trojan 配置。
  * @returns {string} V2ray 链接。
  */
-/*
-function convertTrojan(proxy) {
-    const trojanConfig = [
-        proxy.password + '@' + proxy.server + ':' + proxy.port,
-        `?type=${['tcp', 'ws', 'h2', 'grpc'].includes(proxy.network) ? proxy.network : 'tcp'}`,
-        proxy.tls === true ? (proxy['reality-opts'] ? '&security=reality' : '&security=tls') : '',
-        proxy.tls === true && proxy['reality-opts'] && `&pbk=${proxy['reality-opts']['public-key']}&sid=${proxy['reality-opts']['short-id']}`,
-        (proxy.sni || proxy.servername) && `&sni=${proxy.servername || proxy.sni}`,
-        proxy.alpn && `&alpn=${proxy.alpn}`,
-        proxy['client-fingerprint'] && `&fp=${proxy['client-fingerprint']}`,
-        proxy['skip-cert-verify'] === true && `&allowInsecure=1`,        
-        proxy.network === 'ws' && proxy['ws-opts'] && `&host=${proxy['ws-opts'].headers?.Host || ''}&path=${proxy['ws-opts'].path || ''}`,
-        proxy.network === 'h2' && proxy['h2-opts'] && `&host=${proxy['h2-opts'].host || ''}&path=${proxy['h2-opts'].path || ''}`,
-        proxy.network === 'grpc' && proxy['grpc-opts'] && `&serviceName=${proxy['grpc-opts']['grpc-service-name'] || ''}&mode=gun`
-    ];
-    const result = 'trojan://' + trojanConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
-    console.log(result);
-    return result;
-}
-*/
 function convertTrojan(proxy) {
     if (!proxy || !proxy.server || proxy.port == null || !proxy.password || !proxy.name) {
         console.error("无法生成 URI: 代理对象缺少核心属性。");
@@ -344,23 +270,6 @@ function convertTrojan(proxy) {
  * @param {object} proxy - Clash Hysteria2 配置。
  * @returns {string} V2ray 链接。
  */
-/*
-function convertHysteria2(proxy) {
-    const hysteriaConfig = [
-        proxy.password + '@' + proxy.server + ':' + proxy.port + '?',
-        (proxy.sni || proxy.servername) && `sni=${proxy.servername || proxy.sni}&`,
-        proxy.alpn && `alpn=${proxy.alpn}&`,
-        proxy.obfs && `obfs=${proxy.obfs}&`,
-        proxy['obfs-password'] && `obfs-password=${proxy['obfs-password']}&`,
-        proxy.ports && `mport=${proxy.ports}&`,
-        // proxy['client-fingerprint'] && `fp=${proxy['client-fingerprint']}&`,
-        proxy['skip-cert-verify'] === true && `allowInsecure=1`,
-    ];
-    const result = 'hysteria2://' + hysteriaConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
-    console.log(result);
-    return result;
-}
-*/
 function convertHysteria2(proxy) {
     if (!proxy || !proxy.server || !proxy.port || !proxy.password || !proxy.name) {
         console.error("无法生成 URI: 代理对象缺少核心属性。");
@@ -408,21 +317,6 @@ function convertHysteria2(proxy) {
  * @param {object} proxy - Clash TUIC 配置。
  * @returns {string} V2ray 链接。
  */
-/*
-function convertTuic(proxy) {
-    // TUIC V4 Not Supported
-    if (proxy.token) return;
-    const tuicConfig = [
-        proxy.uuid + ':' + proxy.password + '@' + (proxy.ip ? proxy.ip : proxy.server) + ':' + proxy.port + '?',
-        proxy['disable-sni'] !== true && (proxy.sni || proxy.servername) && `sni=${proxy.servername || proxy.sni}&`,
-        proxy.alpn && `alpn=${proxy.alpn}&`,
-        proxy['congestion-controller'] && `congestion_control=${proxy['congestion-controller']}`,
-    ];
-    const result = 'tuic://' + tuicConfig.filter(Boolean).join('') + '#' + encodeURIComponent(proxy.name);
-    console.log(result);
-    return result;
-}
-*/
 function convertTuic(proxy) {
     if (!proxy || !proxy.uuid || !proxy.password || !proxy.server || !proxy.port || !proxy.name) {
         console.error("无法生成 URI: 代理对象缺少核心属性。");
