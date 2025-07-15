@@ -84,6 +84,7 @@ export function convertClashToV2ray(clashConfig) {
             'trojan': convertTrojan,
             'hysteria2': convertHysteria2,
             'tuic': convertTuic,
+            'socks': convertSocks
         };
         
         const converter = converterMap[proxy.type];
@@ -112,8 +113,7 @@ export function convertClashToV2ray(clashConfig) {
  * @returns {string} V2ray 链接。
  */
 function convertVmess(proxy) {
-    if (!proxy || !proxy.name || !proxy.server || proxy.port == null || !proxy.uuid || proxy.alterId == null) {
-        console.error("无法生成 URI: 代理对象缺少核心属性。");
+    if (!proxy || typeof proxy.server !== 'string' || !proxy.server || typeof proxy.port !== 'number' || !(proxy.port > 0 && proxy.port <= 65535) || !proxy.name || !proxy.uuid || proxy.alterId == null) {
         return null;
     }
 
@@ -198,8 +198,7 @@ function convertVmess(proxy) {
  * @returns {string} V2ray 链接。
  */
 function convertVless(proxy) {
-    if (!proxy || !proxy.server || !proxy.port || !proxy.uuid || !proxy.name) {
-        console.error("无法生成 URI: 代理对象缺少核心属性。");
+    if (!proxy || typeof proxy.server !== 'string' || !proxy.server || typeof proxy.port !== 'number' || !(proxy.port > 0 && proxy.port <= 65535) || !proxy.uuid || !proxy.name) {
         return null;
     }
 
@@ -227,8 +226,7 @@ function convertVless(proxy) {
  * @returns {string} V2ray 链接。
  */
 function convertSs(proxy) {
-    if (!proxy || !proxy.server || proxy.port == null || !proxy.cipher || !proxy.password || !proxy.name) {
-        console.error("无法生成 SS URI: 代理对象缺少核心属性。");
+    if (!proxy || typeof proxy.server !== 'string' || !proxy.server || typeof proxy.port !== 'number' || !(proxy.port > 0 && proxy.port <= 65535) || !proxy.cipher || !proxy.password || !proxy.name) {
         return null;
     }
 
@@ -247,8 +245,7 @@ function convertSs(proxy) {
  * @returns {string} V2ray 链接。
  */
 function convertTrojan(proxy) {
-    if (!proxy || !proxy.server || proxy.port == null || !proxy.password || !proxy.name) {
-        console.error("无法生成 URI: 代理对象缺少核心属性。");
+    if (!proxy || typeof proxy.server !== 'string' || !proxy.server || typeof proxy.port !== 'number' || !(proxy.port > 0 && proxy.port <= 65535) || !proxy.password || !proxy.name) {
         return null;
     }
 
@@ -271,8 +268,7 @@ function convertTrojan(proxy) {
  * @returns {string} V2ray 链接。
  */
 function convertHysteria2(proxy) {
-    if (!proxy || !proxy.server || !proxy.port || !proxy.password || !proxy.name) {
-        console.error("无法生成 URI: 代理对象缺少核心属性。");
+    if (!proxy || typeof proxy.server !== 'string' || !proxy.server || typeof proxy.port !== 'number' || !(proxy.port > 0 && proxy.port <= 65535) || !proxy.password || !proxy.name) {
         return null;
     }
 
@@ -318,8 +314,7 @@ function convertHysteria2(proxy) {
  * @returns {string} V2ray 链接。
  */
 function convertTuic(proxy) {
-    if (!proxy || !proxy.uuid || !proxy.password || !proxy.server || !proxy.port || !proxy.name) {
-        console.error("无法生成 URI: 代理对象缺少核心属性。");
+    if (!proxy || !proxy.uuid || !proxy.password || typeof proxy.server !== 'string' || !proxy.server || typeof proxy.port !== 'number' || !(proxy.port > 0 && proxy.port <= 65535) || !proxy.name) {
         return null;
     }
 
@@ -351,6 +346,29 @@ function convertTuic(proxy) {
     const queryString = params.toString();
 
     const finalURI = `tuic://${authority}${queryString ? '?' + queryString : ''}#${anchor}`;
+
+    console.log(finalURI);
+    return finalURI;
+}
+
+/**
+ * 将 Clash Socks 配置转换为 V2ray 链接。
+ * @param {object} proxy - Clash Socks 配置。
+ * @returns {string} V2ray 链接。
+ */
+function convertSocks(proxy) {
+    if (!proxy || typeof proxy.server !== 'string' || !proxy.server || typeof proxy.port !== 'number' || !(proxy.port > 0 && proxy.port <= 65535) || !proxy.name) {
+        return null;
+    }
+
+    let userInfo = '';
+    if (proxy.username && proxy.password) {
+        userInfo = encodeURIComponent(safeBtoa(`${proxy.username}:${proxy.password}`)) + '@';
+    }
+    const serverAddress = `${proxy.server}:${proxy.port}`;
+    const anchor = encodeURIComponent(proxy.name);
+
+    const finalURI = `socks5://${userInfo}${serverAddress}#${anchor}`;
 
     console.log(finalURI);
     return finalURI;
