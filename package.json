@@ -4,7 +4,7 @@
   "description": "Test",
   "main": "_worker.js",
   "scripts": {
-    "deploy": "wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "build": "wrangler deploy --dry-run",
     "dev": "wrangler dev"
   },

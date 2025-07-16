@@ -6,7 +6,7 @@
  * @param {string} contentType - Content-Type 的值。
  * @returns {Response}
  */
-export function createResponse(body, status = 200, headers = {}, contentType = "text/html; charset=utf-8") {
+export function normal(body, status = 200, headers = {}, contentType = "text/html; charset=utf-8") {
     const responseHeaders = {
       "Content-Type": contentType,
       "Access-Control-Allow-Origin": "*",
@@ -15,3 +15,12 @@ export function createResponse(body, status = 200, headers = {}, contentType = "
     };
     return new Response(body, { status, headers: responseHeaders });
   }
+
+/**
+ * @param {string} msg
+ * @param {number} statusCode
+ * @returns {Response}
+ */
+export function subErr(msg, statusCode) {
+    return normal(JSON.stringify({ statusCode, msg }), statusCode, {}, 'application/json');
+}

@@ -1,0 +1,5 @@
+sub端点返回信息标准
+{
+"status": <code>
+"msg": <success msgs or err msgs>
+}
