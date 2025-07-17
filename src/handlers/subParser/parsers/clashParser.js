@@ -1,4 +1,26 @@
 import YAML from 'js-yaml';
+import z from 'zod';
+
+const SUPPORTED_PROTOCOLS = new Set([
+  'ss',
+  'vmess',
+  'vless',
+  'trojan',
+  'socks5',
+  'hysteria2',
+  'tuic',
+]);
+
+const schema = z.object({
+  proxies: z.array(
+    z.object({
+      name: z.string(),
+      server: z.string(),
+      port: z.number(),
+      type: z.string(),
+    }).catchall(z.unknown())
+  ),
+}).catchall(z.unknown());
 
 /**
  * 解析 Clash 订阅 (YAML 格式)。
@@ -6,16 +28,22 @@ import YAML from 'js-yaml';
  * @returns {object[]} - Clash proxy 对象数组
  */
 export default function parseClash(subStr) {
+  let config;
+
   try {
-    const config = YAML.load(subStr);
-    // Clash 的节点通常在 'proxies' 或 'proxy-groups' 字段下
-    // TODO: 提取 'proxy-groups' 下的节点
-    if (config && Array.isArray(config.proxies)) {
-      return config.proxies;
-    }
-    return [];
+    config = YAML.load(subStr);
   } catch (err) {
-    console.error('Failed to parse Clash subscription:', err);
-    return [];
+    throw new Error('Failed to parse Clash subscription: ' + err);
   }
+
+  const result = schema.safeParse(config);
+  if (!result.success) {
+    throw new Error(`Subscription schema validation failed: ${result.error.errors.map(e => `${e.path.join('.')} ${e.message}`).join(', ')}`);
+  }
+
+  const filteredResult = result.data.proxies.filter(proxy =>
+    SUPPORTED_PROTOCOLS.has(proxy.type)
+  );
+
+  return filteredResult;
 }

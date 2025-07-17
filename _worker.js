@@ -25,7 +25,7 @@ function identifySubType(rawContent) {
     return SubType.UNKNOWN;
   }
 
-  // 步骤 1: 预处理，尝试 Base64 解码
+  // 预处理，尝试 Base64 解码
   const normalizedContent = rawContent.replace(/_/g, '/').replace(/-/g, '+');
   let content = '';
   if (isBase64(normalizedContent)) {
@@ -34,7 +34,7 @@ function identifySubType(rawContent) {
     content = rawContent.trim();
   }
 
-  // 步骤 2: 尝试解析为 Sing-box (JSON)
+  // 尝试解析为 Sing-box (JSON)
   try {
     const data = JSON.parse(content);
     // 验证关键字段，`outbounds` 是 Sing-box 配置的核心
@@ -43,7 +43,7 @@ function identifySubType(rawContent) {
     }
   } catch (err) {};
 
-  // 步骤 3: 尝试解析为 Clash (YAML)
+  // 尝试解析为 Clash (YAML)
   try {
     const data = YAML.load(content);
     // 验证关键字段，`proxies` 是 Clash 配置的核心
@@ -53,7 +53,7 @@ function identifySubType(rawContent) {
     }
   } catch (error) {};
 
-  // 步骤 4: 检查是否为 V2Ray/SS 等行协议格式
+  // 尝试解析为 V2Ray/Xray
   const V2RAY_SCHEMES = ['vmess://', 'vless://', 'ss://', 'hysteria2://', 'trojan://', 'trojan-go://', 'socks://', 'tuic://'];
   const lines = content.trim().split(/\r?\n/);
   for (const line of lines) {

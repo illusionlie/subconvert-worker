@@ -1,14 +1,14 @@
 import * as Responses from '../../utils/response.js';
 import parseClash from './parsers/clashParser';
 import parseV2ray from './parsers/v2rayParser';
-// import parseSingbox from './parsers/singboxParser'; // 待实现
+import parseSingbox from './parsers/singboxParser';
 
 // 1. 解析器注册表
 const parserRegistry = {
   // key 应该与你识别出的 subType 完全对应
   clash: parseClash,
   v2ray: parseV2ray,
-  // 'sing-box': parseSingbox,
+  'sing-box': parseSingbox,
 };
 
 /**
