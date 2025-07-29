@@ -1,12 +1,12 @@
 import * as Responses from '../../utils/response.js';
-import parseClash from './parsers/clashParser';
-import parseV2ray from './parsers/v2rayParser';
-import parseSingbox from './parsers/singboxParser';
+import parseClashNode from './parsers/clashNodeParser.js';
+import parseV2rayNode from './parsers/v2rayNodeParser';
+// import parseSingboxNode from './parsers/singboxNodeParser';
 
-const parserRegistry = {
-  clash: parseClash,
-  v2ray: parseV2ray,
-  'sing-box': parseSingbox,
+const parserNodeRegistry = {
+  clash: parseClashNode,
+  v2ray: parseV2rayNode,
+  // 'sing-box': parseSingboxNode,
 };
 
 /**
@@ -16,8 +16,8 @@ const parserRegistry = {
  * @param {string} subType - 识别出的订阅类型 (e.g., 'clash', 'v2ray')
  * @returns {Array<string|object>} - 解析出的节点数组。可能是字符串，也可能是对象。
  */
-export default function handleSubParse(subStr, subType) {
-  const parser = parserRegistry[subType];
+export default function handleNodeParse(subStr, subType) {
+  const parser = parserNodeRegistry[subType];
 
   if (!parser) {
     return Responses.subErr(`Unsupported subscription type: ${subType}`);
@@ -25,3 +25,4 @@ export default function handleSubParse(subStr, subType) {
 
   return parser(subStr);
 }
+

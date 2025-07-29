@@ -2,6 +2,8 @@ import * as Responses from './src/utils/response.js';
 import { generateBrowserHeaders } from './src/features/headers.js';
 import { isBase64, safeAtob } from './src/features/base64.js';
 import handleSubParse from './src/handlers/subParser/index.js';
+import handleNodeParse from './src/handlers/nodeParser/index.js';
+import { ProxyNodeSchema } from './src/features/UnifiedNode.js';
 import YAML from 'js-yaml';
 
 /**
@@ -89,9 +91,21 @@ export default {
 
         const parsedNodes = handleSubParse(subStr, subType);
         if (!parsedNodes) return Responses.subErr('Failed to parse subscription', 500);
-        // TODO: 等subParser写完后写nodeParser解析每个节点到一个模板, 这里先空着
+        const unifiedNodes = handleNodeParse(parsedNodes, target);
+        if (!unifiedNodes) return Responses.subErr('Failed to parse nodes', 500);
+        
+        for (const node of unifiedNodes) {
+          const result = ProxyNodeSchema.safeParse(node);
+          if (!result.success) {
+            throw new Error(`Node schema validation failed: ${result.error.errors.map(e => `${e.path.join('.')} ${e.message}`).join(', ')}`);
+          }
+        }
 
-        return Responses.normal(parsedNodes, 200, {}, 'application/json');
+        // TODO: 根据通用节点生成指定目标节点
+
+        const generatedSub = handleGenerateSub(unifiedNodes, target);
+
+        return [];
 
       } catch (err) {
         return Responses.subErr(err, 500);

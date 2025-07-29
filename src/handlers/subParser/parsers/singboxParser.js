@@ -1,18 +1,5 @@
+import { SUPPORTED_PROTOCOLS } from '../../../features/UnifiedNode.js';
 import z from 'zod';
-
-const SUPPORTED_PROTOCOLS = new Set([
-  'shadowsocks',
-  'vmess',
-  'vless',
-  'trojan',
-  'hysteria',
-  'hysteria2',
-  'tuic',
-  'shadowtls',
-  'socks',
-  'http',
-  'wireguard',
-]);
   
 const schema = z.object({
   outbounds: z.array(

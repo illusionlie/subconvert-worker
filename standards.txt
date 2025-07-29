@@ -3,3 +3,71 @@ sub端点返回信息标准
 "status": <code>
 "msg": <success msgs or err msgs>
 }
+
+
+统一节点模板
+{
+    // 通用部分
+    name: string, // 节点名称
+    server: string, // 地址(纯IP或域名)
+    port: number, // 端口
+    type: string, // 节点类型
+    udp: boolean, // 是否允许UDP(Clash、Sing-box)
+    tfo: boolean, // 是否启用TCP Fast Open(Clash、Sing-box)
+    mptcp: boolean, // 是否启用TCP Multi Path(Clash、Sing-box)
+    // TLS
+    tls: {
+        enabled: boolean,
+        type: tls|reality, // 只有Vless和Trojan支持REALITY
+        sni: string, // 在Clash中Vless和Vmess中是servername(???)。如果为空，则为 server 中的地址
+        alpn: string[],
+        fp: string, // client-fingerprint
+        allowInsecure: boolean, // 是否允许不安全连接
+        reality: { 
+            publicKey: string,
+            shortId: string,
+        },
+    }
+    // 传输层配置
+    network: {
+        type: string, // 传输层协议
+        ws: {
+            path: string,
+            headers: {
+                Host: string,
+            },
+        },
+        h2: {
+            host: string,
+            path: string,
+        },
+        grpc: {
+            serviceName: string, // Clash、Sing-box。在V2ray(Xray)中是path，作用相同
+            type: gun|multi, // 仅Xray。控制multiMode，除xray外转v2ray都是gun
+            authority: string, // 仅Xray。相当于host，xray以外都不支持
+        },
+    }
+    // Vmess
+    uuid: string, // Also TUIC、Vless
+    alterId: number,
+    cipher: string, // Also Shadowsocks
+    packetEncoding: <string: none/packetaddr/xudp>,
+    globalPadding: boolean,
+    authenticatedLength: boolean,
+    // Vless
+    flow: xtls-rprx-vision|none, // xray中添加的，支持Clash、Sing-box
+    // Trojan/Shadowsocks/Hy2/TUIC
+    password: string,
+    // Hy2
+    ports: string, // 端口跳跃范围 (e.g., 1-100)
+    up: number, // Clash、Sing-box
+    down: number, // Clash、Sing-box
+    obfs: {
+        type: none|salamander, // 伪装类型
+        obfsPassword: string, // 伪装密码
+    }
+    // Tuic
+    heartbeat: number,
+    udpRelayMode: native|quic,
+    congestionController: cubic|new_reno|bbr,
+}

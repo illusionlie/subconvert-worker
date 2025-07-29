@@ -1,15 +1,6 @@
+import { SUPPORTED_PROTOCOLS } from '../../../features/UnifiedNode.js';
 import YAML from 'js-yaml';
 import z from 'zod';
-
-const SUPPORTED_PROTOCOLS = new Set([
-  'ss',
-  'vmess',
-  'vless',
-  'trojan',
-  'socks5',
-  'hysteria2',
-  'tuic',
-]);
 
 const schema = z.object({
   proxies: z.array(
