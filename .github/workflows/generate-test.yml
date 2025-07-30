@@ -1,0 +1,26 @@
+name: Generate and dry-run
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-and-dry-run:
+    runs-on: ubuntu-latest
+    name: Test and Dry-Run Deploy
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dry-run deploy
+        run: npx wrangler deploy --dry-run
