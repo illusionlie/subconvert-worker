@@ -196,5 +196,5 @@ function generateSocks(node) {
   const queryString = params.toString();
   const anchor = encodeURIComponent(node.name);
 
-  return `socks5://${userInfo}@${serverAddress}${queryString ? '?' + queryString : ''}#${anchor}`;
+  return `socks://${userInfo}@${serverAddress}${queryString ? '?' + queryString : ''}#${anchor}`;
 }
