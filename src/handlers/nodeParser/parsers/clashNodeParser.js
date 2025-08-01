@@ -54,21 +54,14 @@ function parseNode(node) {
       fingerprint: node['client-fingerprint'] ?? "random",
     };
   }
-  // TODO: 更新network适配新standards
   if (node.network) {
     standardNode.network = {
       type: node.network,
-      ws: {
-        path: node['ws-opts']?.path ?? '',
-        headers: node['ws-opts']?.headers ?? {},
-      },
-      h2: {
-        host: node['h2-opts']?.host ?? '',
-        path: node['h2-opts']?.path ?? '',
-      },
-      grpc: {
-        serviceName: node['grpc-opts']?.['grpc-service-name'] ?? '',
-      },
+      path: node['ws-opts']?.path ?? node['h2-opts']?.path ?? '',
+      headers: node['ws-opts']?.headers ?? {},
+      host: node['h2-opts']?.host ?? '',
+      serviceName: node['grpc-opts']?.['grpc-service-name'] ?? '',
+      gRPCtype: 'gun',
     };
   }
   console.log(standardNode.network);
