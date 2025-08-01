@@ -7,13 +7,13 @@
  * @returns {Response}
  */
 export function normal(body, status = 200, headers = {}, contentType = "text/html; charset=utf-8") {
-    const responseHeaders = {
-      "Content-Type": contentType,
-      "Access-Control-Allow-Origin": "*",
-      "Cross-Origin-Resource-Policy": "cross-origin",
-      ...headers
-    };
-    return new Response(body, { status, headers: responseHeaders });
+  const responseHeaders = {
+    "Content-Type": contentType,
+    "Access-Control-Allow-Origin": "*",
+    "Cross-Origin-Resource-Policy": "cross-origin",
+    ...headers
+  };
+  return new Response(body, { status, headers: responseHeaders });
   }
 
 /**
@@ -22,5 +22,5 @@ export function normal(body, status = 200, headers = {}, contentType = "text/htm
  * @returns {Response}
  */
 export function subErr(msg, statusCode) {
-    return normal(JSON.stringify({ statusCode, msg }), statusCode, {}, 'application/json');
+  return normal(JSON.stringify({ statusCode, msg }), statusCode, {}, 'application/json');
 }

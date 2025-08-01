@@ -1,4 +1,5 @@
 import * as Responses from './src/utils/response.js';
+import Logger from './src/features/logger.js';
 import { ProxyNodeSchema } from './src/features/UnifiedNode.js';
 import { generateBrowserHeaders } from './src/features/headers.js';
 import { isBase64, safeAtob } from './src/features/base64.js';
@@ -71,12 +72,24 @@ function identifySubType(rawContent) {
 }
 
 export default {
+  /**
+   * @param {Request} request
+   * @param {Env} env
+   * @param {ExecutionContext} ctx
+   * @returns {Promise<Response>}
+   */
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const { pathname, searchParams, origin } = url;
-    const requestHeaders = generateBrowserHeaders();
+    const requestHeaders = generateBrowserHeaders(); // 生成请求头
+    const logger = new Logger(request, env, ctx); // 初始化日志记录器
+
 	
     if (pathname.startsWith('/sub')) {
+      logger.info('Received subscription conversion request', {
+        subUrl: searchParams.get('url'),
+        target: searchParams.get('target'),
+      });
       // URL 参数
       const subUrl = url.searchParams.get('url');
       const target = url.searchParams.get('target');
@@ -92,17 +105,17 @@ export default {
         // 分辨订阅类型
         const subType = identifySubType(subStr);
         if (subType === SubType.UNKNOWN) return Responses.subErr('Unsupported subscription type', 400);
-        console.log(`Subscription type: ${subType}`);
+        logger.info('Identified subscription type', { subType });
 
         // 分离出节点
         const parsedNodes = handleSubParse(subStr, subType);
         if (!parsedNodes) return Responses.subErr('Failed to parse subscription', 500);
-        console.log(`Parsed nodes: ${parsedNodes.length}`);
+        logger.info('Parsed nodes', { nodeCount: parsedNodes.length });
 
         // 将节点解析到统一模板
         const { nodes: unifiedNodes, nodeCounter, convertCounter } = handleNodeParse(parsedNodes, subType);
         if (!unifiedNodes) return Responses.subErr('Failed to parse nodes', 500);
-        console.log(`Unified nodes: ${unifiedNodes.length}`);
+        logger.info('Unified nodes', { nodeCounter, convertCounter });
         
         // 验证节点
         // 验证节点部分出现目前无法解决的问题
@@ -121,7 +134,7 @@ export default {
             throw new Error(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)}`);
           }
         }
-        console.log(result);
+        logger.info('Validated nodes', { nodeCount: unifiedNodes.length });
         */
 
         // 生成目标订阅

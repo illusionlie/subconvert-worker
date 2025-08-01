@@ -1,3 +1,12 @@
-name = "subconverter-worker"
+name = "subconvert-worker"
 main = "_worker.js"
-compatibility_date = "2025-07-21"
+compatibility_date = "2025-08-01"
+
+[vars]
+ENVIRONMENT = "production"
+LOG_LEVEL = "WARN" 
+
+
+[env.dev.vars]
+ENVIRONMENT = "development"
+LOG_LEVEL = "DEBUG"

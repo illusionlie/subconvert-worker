@@ -1,12 +1,12 @@
 {
-  "name": "subconverter-worker",
-  "version": "0.1.0",
-  "description": "Test",
+  "name": "subconvert-worker",
+  "version": "0.2.0",
+  "description": "A Cloudflare Worker to convert between different subscription formats.",
   "main": "_worker.js",
   "scripts": {
     "deploy": "npm run build && wrangler deploy",
-    "build": "wrangler deploy --dry-run",
-    "dev": "wrangler dev"
+    "build": "npm ci & wrangler deploy --dry-run",
+    "dev": "wrangler dev --env dev"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230710.1",
