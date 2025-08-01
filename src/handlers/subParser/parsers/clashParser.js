@@ -32,8 +32,6 @@ export default function parseClash(subStr) {
     throw new Error(`Subscription schema validation failed: ${result.error.errors.map(e => `${e.path.join('.')} ${e.message}`).join(', ')}`);
   }
 
-  console.log(result.data.proxies);
-
   const filteredResult = result.data.proxies.filter(proxy =>
     SUPPORTED_PROTOCOLS.has(proxy.type)
   );

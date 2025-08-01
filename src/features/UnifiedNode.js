@@ -130,6 +130,12 @@ const TuicNodeSchema = BaseNodeSchema.extend({
   heartbeatInterval: z.number().optional(),
 });
 
+const SocksNodeSchema = BaseNodeSchema.extend({
+  type: z.union([z.literal('socks'), z.literal('socks5')]),
+  username: z.string().optional(),
+  password: z.string().optional(),
+});
+
 export const ProxyNodeSchema = z.discriminatedUnion('type', [
   VmessNodeSchema,
   VlessNodeSchema,
@@ -137,4 +143,5 @@ export const ProxyNodeSchema = z.discriminatedUnion('type', [
   TrojanNodeSchema,
   Hysteria2NodeSchema,
   TuicNodeSchema,
+  SocksNodeSchema,
 ]);

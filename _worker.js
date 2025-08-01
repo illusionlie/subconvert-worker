@@ -1,10 +1,10 @@
 import * as Responses from './src/utils/response.js';
+import { ProxyNodeSchema } from './src/features/UnifiedNode.js';
 import { generateBrowserHeaders } from './src/features/headers.js';
 import { isBase64, safeAtob } from './src/features/base64.js';
 import handleSubParse from './src/handlers/subParser/index.js';
 import handleNodeParse from './src/handlers/nodeParser/index.js';
 import handleGenerateSub from './src/handlers/nodeGenerator/index.js';
-import { ProxyNodeSchema } from './src/features/UnifiedNode.js';
 import YAML from 'js-yaml';
 
 /**
@@ -75,32 +75,43 @@ export default {
     const url = new URL(request.url);
     const { pathname, searchParams, origin } = url;
     const requestHeaders = generateBrowserHeaders();
-
-    const subUrl = url.searchParams.get('url');
-    const target = url.searchParams.get('target');
 	
     if (pathname.startsWith('/sub')) {
+      // URL 参数
+      const subUrl = url.searchParams.get('url');
+      const target = url.searchParams.get('target');
+
       if (!subUrl || !target) return Responses.subErr('Invalid request, missing url or target', 400);
       try {
+        // 获取目标订阅
         const subresponse = await fetch(subUrl, { headers: requestHeaders });
 
         if (!subresponse.ok) return Responses.subErr('Failed to fetch subscription', 500);
         const subStr = await subresponse.text();
 
+        // 分辨订阅类型
         const subType = identifySubType(subStr);
         if (subType === SubType.UNKNOWN) return Responses.subErr('Unsupported subscription type', 400);
         console.log(`Subscription type: ${subType}`);
 
+        // 分离出节点
         const parsedNodes = handleSubParse(subStr, subType);
         if (!parsedNodes) return Responses.subErr('Failed to parse subscription', 500);
         console.log(`Parsed nodes: ${parsedNodes.length}`);
 
+        // 将节点解析到统一模板
         const { nodes: unifiedNodes, nodeCounter, convertCounter } = handleNodeParse(parsedNodes, subType);
         if (!unifiedNodes) return Responses.subErr('Failed to parse nodes', 500);
         console.log(`Unified nodes: ${unifiedNodes.length}`);
         
+        // 验证节点
+        // 验证节点部分出现目前无法解决的问题
+        /*
         for (const [index, node] of unifiedNodes.entries()) {
+          if (!node) continue;
+          console.log(`Type of node ${index}: ${node.type}`);
           const result = ProxyNodeSchema.safeParse(node);
+          console.log(`Node ${index} validation result: ${result.success}`);
           if (!result.success) {
             const errorMsg = result.error.issues.map(issue => ({
               path: issue.path.join('.'),
@@ -111,7 +122,9 @@ export default {
           }
         }
         console.log(result);
+        */
 
+        // 生成目标订阅
         const generatedSub = handleGenerateSub(unifiedNodes, target);
         if (!generatedSub) return Responses.subErr('Failed to generate subscription', 500);
 

@@ -64,7 +64,6 @@ function parseNode(node) {
       gRPCtype: 'gun',
     };
   }
-  console.log(standardNode.network);
   if (node.type === 'vmess') {
     if (!node.uuid || node.uuid === '' || node.alterId == null) return null;
     standardNode.uuid = node.uuid;
