@@ -1,6 +1,6 @@
 import { SUPPORTED_PROTOCOLS } from '../../../features/UnifiedNode.js';
 import YAML from 'js-yaml';
-import z from 'zod';
+import z from 'zod/v4';
 
 const schema = z.object({
   proxies: z.array(

@@ -118,24 +118,23 @@ export default {
         logger.info('Unified nodes', { nodeCounter, convertCounter });
         
         // 验证节点
-        // 验证节点部分出现目前无法解决的问题
-        /*
         for (const [index, node] of unifiedNodes.entries()) {
           if (!node) continue;
-          console.log(`Type of node ${index}: ${node.type}`);
           const result = ProxyNodeSchema.safeParse(node);
-          console.log(`Node ${index} validation result: ${result.success}`);
           if (!result.success) {
+            if (env.ENVIRONMENT !== 'development') {
+              logger.warn(`Node at index ${index} failed validation: ${result.error.message}`);
+              continue;
+            }
             const errorMsg = result.error.issues.map(issue => ({
               path: issue.path.join('.'),
               message: issue.message,
               code: issue.code,
             }));
-            throw new Error(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)}`);
+            throw new Error(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)} \n ${JSON.stringify(node, null, 2)}`);
           }
         }
         logger.info('Validated nodes', { nodeCount: unifiedNodes.length });
-        */
 
         // 生成目标订阅
         const generatedSub = handleGenerateSub(unifiedNodes, target);

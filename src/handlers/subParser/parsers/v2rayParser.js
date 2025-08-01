@@ -1,5 +1,5 @@
 import { safeAtob } from '../../../features/base64.js';
-import z from 'zod';
+import z from 'zod/v4';
 
 const SUPPORTED_PROTOCOLS = [
   'vmess://',

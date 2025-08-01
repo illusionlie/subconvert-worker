@@ -288,7 +288,7 @@ function parseNode(nodeLink) {
  */
 export default function parseV2rayNodes(v2rayNodes) {
   if (typeof v2rayNodes !== 'string') {
-    return [];
+    return { nodes: [], nodeCounter: 0, convertCounter: 0 };
   }
   const lines = v2rayNodes
   .split(/\r?\n/)

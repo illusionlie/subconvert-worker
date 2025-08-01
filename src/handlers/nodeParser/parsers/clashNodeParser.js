@@ -7,7 +7,7 @@ import { SUPPORTED_PROTOCOLS } from '../../../features/UnifiedNode.js';
  */
 export default function parseClashNodes(clashNodes) {
   if (!Array.isArray(clashNodes)) {
-    return [];
+    return { nodes: [], nodeCounter: 0, convertCounter: 0 };
   }
   const result = [];
   let nodeCounter = 0;
@@ -55,14 +55,32 @@ function parseNode(node) {
     };
   }
   if (node.network) {
-    standardNode.network = {
-      type: node.network,
-      path: node['ws-opts']?.path ?? node['h2-opts']?.path ?? '',
-      headers: node['ws-opts']?.headers ?? {},
-      host: node['h2-opts']?.host ?? '',
-      serviceName: node['grpc-opts']?.['grpc-service-name'] ?? '',
-      gRPCtype: 'gun',
-    };
+    switch (node.network) {
+      case 'ws': {
+        standardNode.network = {
+          type: 'ws',
+          path: node['ws-opts']?.path ?? '',
+          headers: node['ws-opts']?.headers ?? {},
+        };
+        break;
+      }
+      case 'h2': {
+        standardNode.network = {
+          type: 'h2',
+          host: node['h2-opts']?.host ?? '',
+          path: node['h2-opts']?.path ?? '',
+        };
+        break;
+      }
+      case 'grpc': {
+        standardNode.network = {
+          type: 'grpc',
+          serviceName: node['grpc-opts']?.['grpc-service-name'] ?? '',
+          gRPCtype: 'gun',
+        };
+        break;
+      }
+    }
   }
   if (node.type === 'vmess') {
     if (!node.uuid || node.uuid === '' || node.alterId == null) return null;

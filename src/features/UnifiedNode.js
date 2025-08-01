@@ -1,15 +1,4 @@
-import z from 'zod';
-
-export const SUPPORTED_PROTOCOLS = new Set([
-  'vmess',
-  'vless',
-  'ss',
-  'trojan',
-  'socks',
-  'socks5',
-  'hysteria2',
-  'tuic',
-]);
+import z from 'zod/v4';
 
 /**
 * TLS 配置 Schema
@@ -30,7 +19,7 @@ const TlsSchema = z.discriminatedUnion('enabled', [
           shortId: z.string().optional().describe('REALITY short-id'),
       }).optional().describe('REALITY 相关配置'),
   }),
-]).default({ enabled: false });
+])
 
 
 /**
@@ -54,7 +43,7 @@ const NetworkSchema = z.discriminatedUnion('type', [
       serviceName: z.string().describe('gRPC Service Name'), // Clash、Sing-box
       gRPCtype: z.enum(['gun', 'multi']).default('gun').describe('gRPC 类型'),
   }),
-]).default({ type: 'tcp' });
+])
 
 
 /**
@@ -71,8 +60,8 @@ const BaseNodeSchema = z.object({
   mptcp: z.boolean().default(false).describe('是否启用 TCP Multi Path'),
 
   // 嵌套的复杂配置
-  tls: TlsSchema,
-  network: NetworkSchema,
+  tls: TlsSchema.optional().default({ enabled: false }),
+  network: NetworkSchema.optional().default({ type: 'tcp' }),
 });
 
 
@@ -81,9 +70,11 @@ const BaseNodeSchema = z.object({
 // 每个都继承自 BaseNodeSchema，并添加自己的独特字段
 // =================================================================
 
+// TODO: z.uuid()验证异常
+
 const VmessNodeSchema = BaseNodeSchema.extend({
   type: z.literal('vmess'),
-  uuid: z.string().uuid(),
+  uuid: z.uuid(),
   alterId: z.number().int().min(0).default(0),
   cipher: z.string().default('auto'),
   packetEncoding: z.enum(['xudp', 'packetaddr', 'none']).optional(),
@@ -123,17 +114,24 @@ const ShadowsocksNodeSchema = BaseNodeSchema.extend({
 
 const TuicNodeSchema = BaseNodeSchema.extend({
   type: z.literal('tuic'),
-  uuid: z.string().uuid().describe('在 TUIC v5 中是 uuid'),
+  uuid: z.uuid().describe('在 TUIC v5 中是 uuid'),
   password: z.string().describe('在 TUIC v5 中是 password'),
   congestionController: z.enum(['cubic', 'new_reno', 'bbr']).default('bbr'),
   udpRelayMode: z.enum(['native', 'quic']).default('native'),
   heartbeatInterval: z.number().optional(),
 });
 
-const SocksNodeSchema = BaseNodeSchema.extend({
-  type: z.union([z.literal('socks'), z.literal('socks5')]),
+const BaseSocksNodeSchema = BaseNodeSchema.extend({
   username: z.string().optional(),
   password: z.string().optional(),
+});
+
+const Socks5NodeSchema = BaseSocksNodeSchema.extend({
+  type: z.literal('socks5'),
+});
+
+const SocksLegacyNodeSchema = BaseSocksNodeSchema.extend({
+  type: z.literal('socks'),
 });
 
 export const ProxyNodeSchema = z.discriminatedUnion('type', [
@@ -143,5 +141,17 @@ export const ProxyNodeSchema = z.discriminatedUnion('type', [
   TrojanNodeSchema,
   Hysteria2NodeSchema,
   TuicNodeSchema,
-  SocksNodeSchema,
+  Socks5NodeSchema,
+  SocksLegacyNodeSchema,
+]);
+
+export const SUPPORTED_PROTOCOLS = new Set([
+  'vmess',
+  'vless',
+  'ss',
+  'trojan',
+  'socks',
+  'socks5',
+  'hysteria2',
+  'tuic',
 ]);

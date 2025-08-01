@@ -1,5 +1,5 @@
 import { SUPPORTED_PROTOCOLS } from '../../../features/UnifiedNode.js';
-import z from 'zod';
+import z from 'zod/v4';
   
 const schema = z.object({
   outbounds: z.array(
