@@ -1,11 +1,11 @@
 import * as Responses from '../../utils/response.js';
-import parseClashNode from './parsers/clashNodeParser.js';
-import parseV2rayNode from './parsers/v2rayNodeParser';
+import parseClashNodes from './parsers/clashNodeParser.js';
+import parseV2rayNodes from './parsers/v2rayNodeParser.js';
 // import parseSingboxNode from './parsers/singboxNodeParser';
 
 const parserNodeRegistry = {
-  clash: parseClashNode,
-  v2ray: parseV2rayNode,
+  clash: parseClashNodes,
+  v2ray: parseV2rayNodes,
   // 'sing-box': parseSingboxNode,
 };
 

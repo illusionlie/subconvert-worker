@@ -16,7 +16,7 @@ const generators = {
  * @param {object[]} unifiedNodes - 通用节点对象数组
  * @returns {string} - 生成的 V2Ray 节点
  */
-export function v2rayGenerator(unifiedNodes) {
+export default function v2rayGenerator(unifiedNodes) {
     if (!Array.isArray(unifiedNodes) || unifiedNodes.length === 0) {
     return "";
   }

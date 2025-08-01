@@ -1,10 +1,10 @@
 import * as Responses from '../../utils/response.js';
 // import generateClash from './generators/clashGenerator.js';
-// import generateV2ray from './generators/v2rayGenerator.js';
+import v2rayGenerator from './generators/v2rayGenerator.js';
 
 const generatorRegistry = {
   // clash: generateClash,
-  // v2ray: generateV2ray,
+  v2ray: v2rayGenerator,
 };
 
 /**

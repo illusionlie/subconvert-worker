@@ -3,6 +3,7 @@ import { generateBrowserHeaders } from './src/features/headers.js';
 import { isBase64, safeAtob } from './src/features/base64.js';
 import handleSubParse from './src/handlers/subParser/index.js';
 import handleNodeParse from './src/handlers/nodeParser/index.js';
+import handleGenerateSub from './src/handlers/nodeGenerator/index.js';
 import { ProxyNodeSchema } from './src/features/UnifiedNode.js';
 import YAML from 'js-yaml';
 
@@ -88,27 +89,37 @@ export default {
 
         const subType = identifySubType(subStr);
         if (subType === SubType.UNKNOWN) return Responses.subErr('Unsupported subscription type', 400);
+        console.log(`Subscription type: ${subType}`);
 
         const parsedNodes = handleSubParse(subStr, subType);
         if (!parsedNodes) return Responses.subErr('Failed to parse subscription', 500);
-        const unifiedNodes = handleNodeParse(parsedNodes, target);
+        console.log(`Parsed nodes: ${parsedNodes.length}`);
+
+        const { nodes: unifiedNodes, nodeCounter, convertCounter } = handleNodeParse(parsedNodes, subType);
         if (!unifiedNodes) return Responses.subErr('Failed to parse nodes', 500);
+        console.log(`Unified nodes: ${unifiedNodes.length}`);
         
-        for (const node of unifiedNodes) {
+        for (const [index, node] of unifiedNodes.entries()) {
           const result = ProxyNodeSchema.safeParse(node);
           if (!result.success) {
-            throw new Error(`Node schema validation failed: ${result.error.errors.map(e => `${e.path.join('.')} ${e.message}`).join(', ')}`);
+            const errorMsg = result.error.issues.map(issue => ({
+              path: issue.path.join('.'),
+              message: issue.message,
+              code: issue.code,
+            }));
+            throw new Error(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)}`);
           }
         }
-
-        // TODO: 根据通用节点生成指定目标节点
+        console.log(result);
 
         const generatedSub = handleGenerateSub(unifiedNodes, target);
+        if (!generatedSub) return Responses.subErr('Failed to generate subscription', 500);
 
-        return [];
+        return Responses.normal(generatedSub, 200, {}, 'text/plain');
 
       } catch (err) {
-        return Responses.subErr(err, 500);
+        console.error(err);
+        return Responses.subErr(err.message, 500);
       }
     }
 	

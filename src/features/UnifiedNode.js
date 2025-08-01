@@ -53,8 +53,6 @@ const NetworkSchema = z.discriminatedUnion('type', [
       type: z.literal('grpc'),
       serviceName: z.string().describe('gRPC Service Name'), // Clash、Sing-box
       gRPCtype: z.enum(['gun', 'multi']).default('gun').describe('gRPC 类型'),
-      host: z.string().optional().describe('gRPC Host'),
-      path: z.string().optional().describe('gRPC Path'),
   }),
 ]).default({ type: 'tcp' });
 

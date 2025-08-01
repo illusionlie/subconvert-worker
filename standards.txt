@@ -30,22 +30,14 @@ sub端点返回信息标准
     }
     // 传输层配置
     network: {
-        type: string, // 传输层协议
-        ws: {
-            path: string,
-            headers: {
-                Host: string,
-            },
+        type: tcp|udp|ws|h2|grpc, // 传输层协议
+        host: string, // h2
+        path: string, // ws、h2
+        headers: { // ws
+            Host: string,
         },
-        h2: {
-            host: string,
-            path: string,
-        },
-        grpc: {
-            serviceName: string, // Clash、Sing-box。在V2ray(Xray)中是path，作用相同
-            type: gun|multi, // 仅Xray。控制multiMode，除xray外转v2ray都是gun
-            authority: string, // 仅Xray。相当于host，xray以外都不支持
-        },
+        serviceName: string, // gRPC (Clash、Sing-box。在V2ray(Xray)中是path，作用相同)
+        type: gun|multi, // gRPC (仅Xray。控制multiMode，除xray外，转v2ray都是gun)
     }
     // Vmess
     uuid: string, // Also TUIC、Vless

@@ -6,6 +6,9 @@ import { SUPPORTED_PROTOCOLS } from '../../../features/UnifiedNode.js';
  * @returns {object[]} - 解析后的通用节点对象数组
  */
 export default function parseClashNodes(clashNodes) {
+  if (!Array.isArray(clashNodes)) {
+    return [];
+  }
   const result = [];
   let nodeCounter = 0;
   let convertCounter = 0;
@@ -29,7 +32,10 @@ export default function parseClashNodes(clashNodes) {
 }
 
 function parseNode(node) {
-  if (typeof node !== 'object' || !(node.server ?? node.ip) || !node.port || !node.type) return null;
+  if (typeof node !== 'object' || !(node.server ?? node.ip) || !node.port || !node.type) {
+    console.error(`Failed to parse Clash node: ${node.name}`);
+    return null;
+  }
   const standardNode = {
     type: node.type,
     name: node.name ?? "Unamed",
@@ -48,6 +54,7 @@ function parseNode(node) {
       fingerprint: node['client-fingerprint'] ?? "random",
     };
   }
+  // TODO: 更新network适配新standards
   if (node.network) {
     standardNode.network = {
       type: node.network,
@@ -64,12 +71,13 @@ function parseNode(node) {
       },
     };
   }
+  console.log(standardNode.network);
   if (node.type === 'vmess') {
-    if (!node.uuid || node.uuid === '' || !node.alterId) return null;
+    if (!node.uuid || node.uuid === '' || node.alterId == null) return null;
     standardNode.uuid = node.uuid;
     standardNode.alterId = node.alterId;
     standardNode.cipher = node.cipher ?? "auto";
-    standardNode.packetEncoding = node.packetEncoding ?? '';
+    standardNode.packetEncoding = node.packetEncoding ?? 'none';
     standardNode.globalPadding = node.globalPadding ?? false;
     standardNode.authenticatedLength = node.authenticatedLength ?? false;
   }
