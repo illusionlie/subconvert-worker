@@ -118,26 +118,30 @@ export default {
         logger.info('Unified nodes', { nodeCounter, convertCounter });
         
         // 验证节点
+        let validNodes = [];
         for (const [index, node] of unifiedNodes.entries()) {
           if (!node) continue;
           const result = ProxyNodeSchema.safeParse(node);
           if (!result.success) {
-            if (env.ENVIRONMENT !== 'development') {
-              logger.warn(`Node at index ${index} failed validation: ${result.error.message}`);
-              continue;
-            }
             const errorMsg = result.error.issues.map(issue => ({
               path: issue.path.join('.'),
               message: issue.message,
               code: issue.code,
             }));
-            throw new Error(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)} \n ${JSON.stringify(node, null, 2)}`);
+            /*
+            if (env.ENVIRONMENT === 'development') {
+              throw new Error(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)} ${JSON.stringify(node, null, 2)}`);
+            }
+            */
+            logger.warn(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)} ${JSON.stringify(node, null, 2)}`);
+            continue;
           }
+          validNodes.push(node);
         }
-        logger.info('Validated nodes', { nodeCount: unifiedNodes.length });
+        logger.info('Validated nodes', { nodeCount: validNodes.length });
 
         // 生成目标订阅
-        const generatedSub = handleGenerateSub(unifiedNodes, target);
+        const generatedSub = handleGenerateSub(validNodes, target);
         if (!generatedSub) return Responses.subErr('Failed to generate subscription', 500);
 
         return Responses.normal(generatedSub, 200, {}, 'text/plain');
