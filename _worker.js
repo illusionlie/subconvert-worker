@@ -86,13 +86,15 @@ export default {
 
 	
     if (pathname.startsWith('/sub')) {
-      logger.info('Received subscription conversion request', {
-        subUrl: searchParams.get('url'),
-        target: searchParams.get('target'),
-      });
       // URL 参数
       const subUrl = url.searchParams.get('url');
       const target = url.searchParams.get('target');
+      const testOnly = url.searchParams.get('testOnly');
+      logger.info('Received subscription conversion request', {
+        subUrl,
+        target,
+        testOnly,
+      });
 
       if (!subUrl || !target) return Responses.sub('Invalid request, missing url or target', 400);
       try {
@@ -139,6 +141,8 @@ export default {
           validNodes.push(node);
         }
         logger.info('Validated nodes', { nodeCount: validNodes.length });
+
+        if (testOnly === 'true') return Responses.sub('Test passed', 200, { nodeCount: parsedNodes.length, validNodeCount: validNodes.length });
 
         // 生成目标订阅
         const generatedSub = handleGenerateSub(validNodes, target);

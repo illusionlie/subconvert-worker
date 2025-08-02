@@ -21,6 +21,6 @@ export function normal(body, status = 200, headers = {}, contentType = "text/htm
  * @param {number} statusCode
  * @returns {Response}
  */
-export function sub(msg, statusCode) {
-  return normal(JSON.stringify({ statusCode, msg }), statusCode, {}, 'application/json');
+export function sub(msg, statusCode, extra = {}) {
+  return normal(JSON.stringify({ statusCode, msg, extra }), statusCode, {}, 'application/json');
 }
