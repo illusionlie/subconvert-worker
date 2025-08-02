@@ -31,7 +31,8 @@ const NetworkSchema = z.discriminatedUnion('type', [
   z.object({
       type: z.literal('ws'),
       path: z.string().default('/'),
-      headers: z.record(z.string()).optional().describe('WebSocket Headers, e.g., { "Host": "example.com" }'),
+      // headers: z.record(z.string()).optional().describe('WebSocket Headers, e.g., { "Host": "example.com" }'),
+      headers: z.object({}).catchall(z.string()).optional().describe('WebSocket Headers, e.g., { "Host": "example.com" }'),
   }),
   z.object({
       type: z.literal('h2'),
