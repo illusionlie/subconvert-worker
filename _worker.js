@@ -94,27 +94,27 @@ export default {
       const subUrl = url.searchParams.get('url');
       const target = url.searchParams.get('target');
 
-      if (!subUrl || !target) return Responses.subErr('Invalid request, missing url or target', 400);
+      if (!subUrl || !target) return Responses.sub('Invalid request, missing url or target', 400);
       try {
         // 获取目标订阅
         const subresponse = await fetch(subUrl, { headers: requestHeaders });
 
-        if (!subresponse.ok) return Responses.subErr('Failed to fetch subscription', 500);
+        if (!subresponse.ok) return Responses.sub('Failed to fetch subscription', 500);
         const subStr = await subresponse.text();
 
         // 分辨订阅类型
         const subType = identifySubType(subStr);
-        if (subType === SubType.UNKNOWN) return Responses.subErr('Unsupported subscription type', 400);
+        if (subType === SubType.UNKNOWN) return Responses.sub('Unsupported subscription type', 400);
         logger.info('Identified subscription type', { subType });
 
         // 分离出节点
         const parsedNodes = handleSubParse(subStr, subType);
-        if (!parsedNodes) return Responses.subErr('Failed to parse subscription', 500);
+        if (!parsedNodes) return Responses.sub('Failed to parse subscription', 500);
         logger.info('Parsed nodes', { nodeCount: parsedNodes.length });
 
         // 将节点解析到统一模板
         const { nodes: unifiedNodes, nodeCounter, convertCounter } = handleNodeParse(parsedNodes, subType);
-        if (!unifiedNodes) return Responses.subErr('Failed to parse nodes', 500);
+        if (!unifiedNodes) return Responses.sub('Failed to parse nodes', 500);
         logger.info('Unified nodes', { nodeCounter, convertCounter });
         
         // 验证节点
@@ -142,13 +142,13 @@ export default {
 
         // 生成目标订阅
         const generatedSub = handleGenerateSub(validNodes, target);
-        if (!generatedSub) return Responses.subErr('Failed to generate subscription', 500);
+        if (!generatedSub) return Responses.sub('Failed to generate subscription', 500);
 
         return Responses.normal(generatedSub, 200, {}, 'text/plain');
 
       } catch (err) {
         console.error(err);
-        return Responses.subErr(err.message, 500);
+        return Responses.sub(err.message, 500);
       }
     }
 	

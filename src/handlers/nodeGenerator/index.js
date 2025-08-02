@@ -15,11 +15,11 @@ const generatorRegistry = {
  * @returns {string} - 生成的订阅节点
  */
 export default function handleGenerateSub(nodes, targetType) {
-    const generator = generatorRegistry[targetType];
+  const generator = generatorRegistry[targetType];
 
-    if (!generator) {
-        return Responses.subErr(`Unsupported target type: ${targetType}`);
-    }
+  if (!generator) {
+      throw new Error(`Unsupported target type: ${targetType}`);
+  }
 
-    return generator(nodes);
+  return generator(nodes);
 }

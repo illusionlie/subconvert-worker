@@ -20,7 +20,7 @@ export default function handleNodeParse(subStr, subType) {
   const parser = parserNodeRegistry[subType];
 
   if (!parser) {
-    return Responses.subErr(`Unsupported subscription type: ${subType}`);
+    throw new Error(`Unsupported subscription type: ${subType}`);
   }
 
   return parser(subStr);
