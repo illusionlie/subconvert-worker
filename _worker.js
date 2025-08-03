@@ -87,9 +87,9 @@ export default {
 	
     if (pathname.startsWith('/sub')) {
       // URL 参数
-      const subUrl = url.searchParams.get('url');
-      const target = url.searchParams.get('target');
-      const testOnly = url.searchParams.get('testOnly');
+      const subUrl = decodeURIComponent(url.searchParams.get('url'))  || '';
+      const target = url.searchParams.get('target') || '';
+      const testOnly = url.searchParams.get('testOnly') === 'true' || 'false';
       logger.info('Received subscription conversion request', {
         subUrl,
         target,
@@ -143,7 +143,7 @@ export default {
         logger.info('Validated nodes', { nodeCount: validNodes.length });
 
         // 测试模式
-        if (testOnly === 'true') {
+        if (testOnly) {
           logger.info('Test mode enabled, returning early');
           return Responses.sub('Test passed', 200, { nodeCount: parsedNodes.length, validNodeCount: validNodes.length });
         }
