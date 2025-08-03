@@ -87,7 +87,7 @@ function parseNode(node) {
     standardNode.uuid = node.uuid;
     standardNode.alterId = node.alterId;
     standardNode.cipher = node.cipher ?? "auto";
-    standardNode.packetEncoding = node.packetEncoding ?? 'none';
+    standardNode.packetEncoding = node.packetEncoding ?? '';
     standardNode.globalPadding = node.globalPadding ?? false;
     standardNode.authenticatedLength = node.authenticatedLength ?? false;
   }
@@ -105,10 +105,10 @@ function parseNode(node) {
     if (!node.password || node.password === '') return null;
     standardNode.ports = node.ports ?? '';
     standardNode.password = node.password ?? node.id;
-    standardNode.up = node.up ?? 0;
-    standardNode.down = node.down ?? 0;
+    standardNode.up = node.up ? parseInt(String(node.up).replace(/[^0-9]/g, '')) : 0;
+    standardNode.down = node.down ? parseInt(String(node.down).replace(/[^0-9]/g, '')) : 0;
     standardNode.obfs = {
-      type: node.obfs ?? 'none',
+      type: node.obfs ?? '',
       password: node['obfs-password'] ?? '',
     }
   }

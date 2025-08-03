@@ -89,7 +89,7 @@ function parseVmess(node) {
           headers: config.host ? { Host: config.host } : {},
         },
         h2: {
-          host: config.host || '',
+          host: [config.host] || [],
           path: config.path || '',
         },
         grpc: {
@@ -174,7 +174,7 @@ function parseHysteria2(node) {
       up: Number(params.get('up')) || 0,
       down: Number(params.get('down')) || 0,
       obfs: {
-        type: params.get('obfs') || 'none',
+        type: params.get('obfs') || '',
         obfsPassword: params.get('obfs-password') || '',
       },
       tls: {

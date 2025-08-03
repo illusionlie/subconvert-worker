@@ -36,8 +36,8 @@ const NetworkSchema = z.discriminatedUnion('type', [
   }),
   z.object({
       type: z.literal('h2'),
-      host: z.string().describe('HTTP/2 主机名/域名'),
-      path: z.string().default('/'),
+      host: z.array(z.string()).describe('HTTP/2 主机名/域名'),
+      path: z.string().default('/').describe('HTTP/2 路径'),
   }),
   z.object({
       type: z.literal('grpc'),
@@ -76,7 +76,7 @@ const VmessNodeSchema = BaseNodeSchema.extend({
   uuid: z.string(),
   alterId: z.number().int().min(0).default(0),
   cipher: z.string().default('auto'),
-  packetEncoding: z.enum(['xudp', 'packetaddr', 'none']).optional(),
+  packetEncoding: z.enum(['xudp', 'packetaddr', '']).optional(),
   globalPadding: z.boolean().optional(),
   authenticatedLength: z.boolean().optional(),
 });
@@ -100,7 +100,7 @@ const Hysteria2NodeSchema = BaseNodeSchema.extend({
   up: z.number().int().min(0).default(0).describe('上行带宽限制 (单位: Mbps)'), // Clash、Sing-box
   down: z.number().int().min(0).default(0).describe('下行带宽限制 (单位: Mbps)'), // Clash、Sing-box
   obfs: z.object({
-      type: z.enum(['salamander', 'none']).default('none'),
+      type: z.enum(['salamander', '']).default(''),
       password: z.string().optional(),
   }).optional(),
 });
