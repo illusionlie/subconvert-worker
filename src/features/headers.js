@@ -1,11 +1,10 @@
-// src/features/headers.js
 import { getRandom } from '../utils/tools.js';
 
 /**
- * 生成一个伪造的浏览器请求头对象。
+ * 生成一个伪造的请求头对象。
  * @returns {Headers}
  */
-export function generateBrowserHeaders() {
+export function generateBrowserHeaders(ua) {
   const browserProfiles = [
     {
       name: "Windows 10 - Chrome",
@@ -57,16 +56,25 @@ export function generateBrowserHeaders() {
     },
   ];
 
-  // 计算总权重
-  const totalWeight = browserProfiles.reduce((sum, profile) => sum + profile.weight, 0);
-  let randomWeight = Math.random() * totalWeight;
   let UA;
-    
-  for (const profile of browserProfiles) {
-    if (randomWeight < profile.weight) {
-      UA = profile.uaTemplate();
+
+  // 浏览器 UA
+  if (ua === 'browser') {
+    // 计算总权重
+    const totalWeight = browserProfiles.reduce((sum, profile) => sum + profile.weight, 0);
+    let randomWeight = Math.random() * totalWeight;
+
+    for (const profile of browserProfiles) {
+      if (randomWeight < profile.weight) {
+        UA = profile.uaTemplate();
+      }
+      randomWeight -= profile.weight;
     }
-    randomWeight -= profile.weight;
+  } else if (ua === 'default') {
+    // 默认 UA
+    UA = 'subconvert-worker/0.2.0 (+https://github.com/illusionlie/subconvert-worker)';
+  } else {
+    UA = ua;
   }
 
   let requestHeaders = new Headers();

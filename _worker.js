@@ -81,7 +81,6 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const { pathname, searchParams, origin } = url;
-    const requestHeaders = generateBrowserHeaders(); // 生成请求头
     const logger = new Logger(request, env, ctx); // 初始化日志记录器
 
 	
@@ -90,14 +89,17 @@ export default {
       const subUrl = decodeURIComponent(url.searchParams.get('url'))  || '';
       const target = url.searchParams.get('target') || '';
       const testOnly = url.searchParams.get('testOnly') === 'true' || 'false';
+      const ua = url.searchParams.get('ua') || 'default';
       logger.info('Received subscription conversion request', {
         subUrl,
         target,
         testOnly,
+        ua,
       });
 
       if (!subUrl || !target) return Responses.sub('Invalid request, missing url or target', 400);
       try {
+        const requestHeaders = generateBrowserHeaders(ua);
         // 获取目标订阅
         const subresponse = await fetch(subUrl, { headers: requestHeaders });
 
