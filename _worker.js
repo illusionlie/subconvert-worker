@@ -142,7 +142,11 @@ export default {
         }
         logger.info('Validated nodes', { nodeCount: validNodes.length });
 
-        if (testOnly === 'true') return Responses.sub('Test passed', 200, { nodeCount: parsedNodes.length, validNodeCount: validNodes.length });
+        // 测试模式
+        if (testOnly === 'true') {
+          logger.info('Test mode enabled, returning early');
+          return Responses.sub('Test passed', 200, { nodeCount: parsedNodes.length, validNodeCount: validNodes.length });
+        }
 
         // 生成目标订阅
         const generatedSub = handleGenerateSub(validNodes, target);
