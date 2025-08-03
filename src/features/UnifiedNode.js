@@ -12,7 +12,7 @@ const TlsSchema = z.discriminatedUnion('enabled', [
       serverName: z.string().optional().describe('SNI (Server Name Indication)'),
       allowInsecure: z.boolean().default(false).describe('是否允许不安全连接 (例如自签名证书)'),
       alpn: z.array(z.string()).optional().describe('应用层协议协商 (h2, http/1.1)'),
-      fingerprint: z.enum(['chrome', 'firefox', 'safari', 'ios', 'random']).default('random').describe('TLS 指纹 (uTLS)'),
+      fingerprint: z.enum(['chrome', 'firefox', 'safari', 'ios', 'random', 'randomized']).default('chrome').describe('TLS 指纹 (uTLS)'),
       // REALITY 配置
       reality: z.object({
           publicKey: z.string().describe('REALITY public key'),
@@ -71,11 +71,9 @@ const BaseNodeSchema = z.object({
 // 每个都继承自 BaseNodeSchema，并添加自己的独特字段
 // =================================================================
 
-// TODO: z.uuid()验证异常
-
 const VmessNodeSchema = BaseNodeSchema.extend({
   type: z.literal('vmess'),
-  uuid: z.uuid(),
+  uuid: z.string(),
   alterId: z.number().int().min(0).default(0),
   cipher: z.string().default('auto'),
   packetEncoding: z.enum(['xudp', 'packetaddr', 'none']).optional(),
@@ -85,7 +83,7 @@ const VmessNodeSchema = BaseNodeSchema.extend({
 
 const VlessNodeSchema = BaseNodeSchema.extend({
   type: z.literal('vless'),
-  uuid: z.string().uuid(),
+  uuid: z.string(),
   flow: z.string().optional().describe('流控 (e.g., xtls-rprx-vision)'),
   packetEncoding: z.enum(['xudp', 'packetaddr', 'none']).optional(),
 });

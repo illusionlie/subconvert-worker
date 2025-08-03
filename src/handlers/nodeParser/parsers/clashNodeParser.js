@@ -95,7 +95,7 @@ function parseNode(node) {
     if (!node.uuid || node.uuid === '') return null;
     standardNode.uuid = node.uuid ?? node.id;
     standardNode.flow = node.flow ?? '';
-    standardNode.packetEncoding = node.packetEncoding ?? '';
+    standardNode.packetEncoding = node.packetEncoding ?? 'none';
   }
   if (node.type === 'trojan') {
     if (!node.password || node.password === '') return null;
