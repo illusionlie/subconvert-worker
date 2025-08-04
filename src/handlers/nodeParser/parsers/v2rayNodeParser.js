@@ -73,7 +73,7 @@ function parseVmess(node) {
       port: Number(config.port),
       uuid: config.id,
       cipher: config.scy || 'auto',
-      alterId: config.aid || 0,
+      alterId: Number(config.aid) || 0,
       tls: {
         enabled: !!config.tls,
         type: config.tls || '',
