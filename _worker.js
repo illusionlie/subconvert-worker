@@ -88,7 +88,7 @@ export default {
       // URL 参数
       const subUrl = decodeURIComponent(searchParams.get('url'))  || '';
       const target = searchParams.get('target') || '';
-      const testOnly = searchParams.get('testOnly') === 'true' || false;
+      const testOnly = searchParams.get('testOnly') || 'false';
       const ua = searchParams.get('ua') || 'default';
       logger.info('Received subscription conversion request', {
         subUrl,
