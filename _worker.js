@@ -86,10 +86,10 @@ export default {
 	
     if (pathname.startsWith('/sub')) {
       // URL 参数
-      const subUrl = decodeURIComponent(url.searchParams.get('url'))  || '';
-      const target = url.searchParams.get('target') || '';
-      const testOnly = url.searchParams.get('testOnly') === 'true' || 'false';
-      const ua = url.searchParams.get('ua') || 'default';
+      const subUrl = decodeURIComponent(searchParams.get('url'))  || '';
+      const target = searchParams.get('target') || '';
+      const testOnly = searchParams.get('testOnly') === 'true' || 'false';
+      const ua = searchParams.get('ua') || 'default';
       logger.info('Received subscription conversion request', {
         subUrl,
         target,
