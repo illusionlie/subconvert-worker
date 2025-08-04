@@ -1,9 +1,9 @@
 import * as Responses from '../../utils/response.js';
-// import generateClash from './generators/clashGenerator.js';
+import generateClash from './generators/clashGenerator.js';
 import v2rayGenerator from './generators/v2rayGenerator.js';
 
 const generatorRegistry = {
-  // clash: generateClash,
+  clash: generateClash,
   v2ray: v2rayGenerator,
 };
 
