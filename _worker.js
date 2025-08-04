@@ -154,7 +154,15 @@ export default {
         const generatedSub = handleGenerateSub(validNodes, target);
         if (!generatedSub) return Responses.sub('Failed to generate subscription', 500);
 
-        return Responses.normal(generatedSub, 200, {}, 'text/plain');
+        // 根据目标类型决定返回的 Content-Type
+        let contentType = 'text/plain; charset=utf-8';
+        if (target === 'clash') {
+          contentType = 'text/yaml; charset=utf-8';
+        } else if (target === 'v2ray') {
+          contentType = 'text/plain; charset=utf-8';
+        }
+
+        return Responses.normal(generatedSub, 200, {}, contentType);
 
       } catch (err) {
         console.error(err);
