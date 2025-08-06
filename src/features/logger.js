@@ -22,6 +22,11 @@ export default class Logger {
     // 开发环境默认为 info，生产环境默认为 warn
     const defaultLogLevel = env.ENVIRONMENT === 'development' ? 'info' : 'warn';
     this.logLevel = logLevels[env.LOG_LEVEL?.toLowerCase() || defaultLogLevel];
+
+    // 确保日志级别在定义的范围内
+    if (this.logLevel === undefined) {
+      this.logLevel = logLevels[defaultLogLevel];
+    }
     
     // 检查请求头以确定是否需要覆盖日志级别
     this.debugOverride = request.headers.get('X-Debug-Log') === 'true';
