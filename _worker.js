@@ -68,7 +68,7 @@ function identifySubType(rawContent) {
   }
 
   // 如果所有检查都失败
-  return SubscriptionType.UNKNOWN;
+  return SubType.UNKNOWN;
 }
 
 export default {
