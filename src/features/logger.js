@@ -114,4 +114,8 @@ export default class Logger {
         this._log('error', message, data);
     }
   }
+  
+  fatal(message, data) {
+    this._log('fatal', message, data);
+  }
 }
