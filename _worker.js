@@ -88,7 +88,7 @@ export default {
       // 订阅URL
       const subUrl = decodeURIComponent(searchParams.get('url'))  || '';
       // 目标订阅类型
-      const target = searchParams.get('target') || '';
+      const target = searchParams.get('target').toLowerCase() || '';
       // User-Agent
       const ua = searchParams.get('ua') || 'default';
       // 测试模式
@@ -106,7 +106,14 @@ export default {
 
       if (!subUrl || !target) return Responses.sub('Invalid request, missing url or target', 400);
       try {
+        // 判断 target 是否支持
+        if (!Object.values(SubType).includes(target)) {
+          return Responses.sub('Unsupported target type', 400);
+        }
+
+        // 生成请求头
         const requestHeaders = generateBrowserHeaders(ua);
+        
         // 获取目标订阅
         const subresponse = await fetch(subUrl, { headers: requestHeaders });
 
