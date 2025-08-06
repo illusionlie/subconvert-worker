@@ -58,7 +58,7 @@ function identifySubType(rawContent) {
   } catch (error) {};
 
   // 尝试解析为 V2Ray/Xray
-  const V2RAY_SCHEMES = ['vmess://', 'vless://', 'ss://', 'hysteria2://', 'trojan://', 'trojan-go://', 'socks://', 'tuic://'];
+  const V2RAY_SCHEMES = ['vmess://', 'vless://', 'ss://', 'hysteria2://', 'trojan://', 'trojan-go://', 'socks://', 'tuic://', 'wireguard://'];
   const lines = content.trim().split(/\r?\n/);
   for (const line of lines) {
     const trimmedLine = line.trim();
@@ -85,16 +85,23 @@ export default {
 
 	
     if (pathname.startsWith('/sub')) {
-      // URL 参数
+      // 订阅URL
       const subUrl = decodeURIComponent(searchParams.get('url'))  || '';
+      // 目标订阅类型
       const target = searchParams.get('target') || '';
-      const testOnly = searchParams.get('testOnly') || 'false';
+      // User-Agent
       const ua = searchParams.get('ua') || 'default';
+      // 测试模式
+      const testOnly = searchParams.get('testOnly') || 'false';
+      // 严格模式
+      const strict = searchParams.get('strict') || 'false';
+
       logger.info('Received subscription conversion request', {
         subUrl,
         target,
-        testOnly,
         ua,
+        testOnly,
+        strict,
       });
 
       if (!subUrl || !target) return Responses.sub('Invalid request, missing url or target', 400);
@@ -132,11 +139,9 @@ export default {
               message: issue.message,
               code: issue.code,
             }));
-            /*
-            if (env.ENVIRONMENT === 'development') {
+            if (strict === 'true') {
               throw new Error(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)} ${JSON.stringify(node, null, 2)}`);
             }
-            */
             logger.warn(`Node at index ${index} failed validation: ${JSON.stringify(errorMsg, null, 2)} ${JSON.stringify(node, null, 2)}`);
             continue;
           }
