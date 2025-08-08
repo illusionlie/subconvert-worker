@@ -67,12 +67,13 @@ export function generateBrowserHeaders(ua) {
     for (const profile of browserProfiles) {
       if (randomWeight < profile.weight) {
         UA = profile.uaTemplate();
+        break;
       }
       randomWeight -= profile.weight;
     }
   } else if (ua === 'default') {
     // 默认 UA
-    UA = 'subconvert-worker/0.2.0 (+https://github.com/illusionlie/subconvert-worker)';
+    UA = 'subconvert-worker/0.2.0';
   } else {
     UA = ua;
   }
