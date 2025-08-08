@@ -39,7 +39,7 @@ function parseNode(node) {
   const standardNode = {
     type: node.type,
     name: node.name ?? "Unamed",
-    server: node.ip ?? node.server, // node.ip 是TUIC的覆写选项
+    server: node.server,
     port: node.port,
     udp: node.udp ?? false,
     tfo: node.tfo ?? false,
@@ -48,7 +48,7 @@ function parseNode(node) {
   if (node.tls === true) {
     standardNode.tls = {
       enabled: true,
-      serverName: (node.sni ?? node.servername) ?? '',
+      serverName: (node.sni ?? node.servername) ?? node.server,
       allowInsecure: node['skip-cert-verify'] ?? false,
       alpn: node.alpn ?? [],
       fingerprint: node['client-fingerprint'] ?? "random",
@@ -59,7 +59,7 @@ function parseNode(node) {
       case 'ws': {
         standardNode.network = {
           type: 'ws',
-          path: node['ws-opts']?.path ?? '',
+          path: node['ws-opts']?.path ?? '/',
           headers: node['ws-opts']?.headers ?? {},
         };
         break;
@@ -68,7 +68,7 @@ function parseNode(node) {
         standardNode.network = {
           type: 'h2',
           host: [node['h2-opts']?.host] || [],
-          path: node['h2-opts']?.path ?? '',
+          path: node['h2-opts']?.path ?? '/',
         };
         break;
       }
@@ -93,7 +93,7 @@ function parseNode(node) {
   }
   if (node.type === 'vless') {
     if (!node.uuid || node.uuid === '') return null;
-    standardNode.uuid = node.uuid ?? node.id;
+    standardNode.uuid = node.uuid;
     standardNode.flow = node.flow ?? '';
     standardNode.packetEncoding = node.packetEncoding ?? 'none';
   }
@@ -119,8 +119,11 @@ function parseNode(node) {
   }
   if (node.type === 'tuic') {
     if (!node.uuid || node.uuid === '' || !node.password || node.password === '' || node.token) return null;
-    standardNode.uuid = node.uuid ?? node.id;
-    standardNode.password = node.password ?? node.id;
+    if (node.ip) {
+      standardNode.server = node.ip;
+    }
+    standardNode.uuid = node.uuid;
+    standardNode.password = node.password;
     standardNode.heartbeatInterval = node['heartbeat-interval'] ?? 0;
     standardNode.udpRelayMode = node['udp-relay-mode'] ?? 'native';
     standardNode.congestionController = node['congestion-controller'] ?? 'bbr';
