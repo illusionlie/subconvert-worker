@@ -5,13 +5,24 @@ import { getRandom } from '../utils/tools.js';
  * @returns {Headers}
  */
 export function generateBrowserHeaders(ua) {
+  const chromiumVersionMin = 136;
+  const chromiumVersionMax = 139;
+  const firefoxVersionMin = 138;
+  const firefoxVersionMax = 141;
+  const safariVersionMin = 16;
+  const safariVersionMax = 18;
+
+
+  const chromeVersion = `${getRandom(chromiumVersionMin, chromiumVersionMax)}.0.${getRandom(6300, 6400)}.${getRandom(50, 150)}`;
+  const edgeVersion = `${getRandom(chromiumVersionMin, chromiumVersionMax)}.0.${getRandom(2400, 2500)}.${getRandom(50, 100)}`;
+  const firefoxVersion = `${getRandom(firefoxVersionMin, firefoxVersionMax)}.0`;
+  const safariVersion = `${getRandom(safariVersionMin, safariVersionMax)}.${getRandom(0, 5)}`;
   const browserProfiles = [
     {
       name: "Windows 10 - Chrome",
       weight: 45,
       uaTemplate: () => {
         const platform = Math.random() < 0.5 ? "Win64; x64" : "WOW64";
-        const chromeVersion = `${getRandom(124, 126)}.0.${getRandom(6300, 6400)}.${getRandom(50, 150)}`;
         return `Mozilla/5.0 (Windows NT 10.0; ${platform}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chromeVersion} Safari/537.36`;
       },
     },
@@ -20,7 +31,6 @@ export function generateBrowserHeaders(ua) {
       weight: 20,
       uaTemplate: () => {
         const platform = Math.random() < 0.5 ? "Win64; x64" : "WOW64";
-        const edgeVersion = `${getRandom(124, 126)}.0.${getRandom(2400, 2500)}.${getRandom(50, 100)}`;
         return `Mozilla/5.0 (Windows NT 10.0; ${platform}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${edgeVersion} Safari/537.36 Edg/${edgeVersion}`;
       },
     },
@@ -29,7 +39,6 @@ export function generateBrowserHeaders(ua) {
       weight: 15,
       uaTemplate: () => {
         const platform = Math.random() < 0.5 ? "Win64; x64" : "WOW64";
-        const firefoxVersion = `${getRandom(125, 127)}.0`;
         // ESR (Extended Support Release) 版本的出现概率较低
         const isESR = Math.random() < 0.3 ? "esr" : "";
         return `Mozilla/5.0 (Windows NT 10.0; ${platform}; rv:${firefoxVersion}) Gecko/20100101 Firefox/${firefoxVersion}${isESR}`;
@@ -41,7 +50,6 @@ export function generateBrowserHeaders(ua) {
       uaTemplate: () => {
         const macVersion = `10_15_${getRandom(5, 7)}`;
         const webkitVersion = `${getRandom(605, 615)}.${getRandom(1, 3)}.${getRandom(1, 40)}`;
-        const safariVersion = `${getRandom(15, 17)}.${getRandom(0, 5)}`;
         return `Mozilla/5.0 (Macintosh; Intel Mac OS X ${macVersion}) AppleWebKit/${webkitVersion} (KHTML, like Gecko) Version/${safariVersion} Safari/${webkitVersion}`;
       },
     },
@@ -50,7 +58,6 @@ export function generateBrowserHeaders(ua) {
       weight: 5,
       uaTemplate: () => {
         const macVersion = `10_15_${getRandom(5, 7)}`;
-        const chromeVersion = `${getRandom(124, 126)}.0.${getRandom(6300, 6400)}.${getRandom(50, 150)}`;
         return `Mozilla/5.0 (Macintosh; Intel Mac OS X ${macVersion}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${chromeVersion} Safari/537.36`;
       },
     },
