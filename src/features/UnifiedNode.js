@@ -152,6 +152,9 @@ export const ProxyNodeSchema = z.discriminatedUnion('type', [
   SocksLegacyNodeSchema,
 ]);
 
+/**
+ * 支持的协议类型
+ */
 export const SUPPORTED_PROTOCOLS = new Set([
   'vmess',
   'vless',
@@ -162,3 +165,8 @@ export const SUPPORTED_PROTOCOLS = new Set([
   'hysteria2',
   'tuic',
 ]);
+
+/**
+ * V2Ray 支持的协议 schemes
+ */
+export const V2RAY_SCHEMES = ['vmess://', 'vless://', 'ss://', 'hysteria2://', 'trojan://', 'trojan-go://', 'socks://', 'tuic://', 'wireguard://'];

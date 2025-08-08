@@ -1,18 +1,9 @@
 import { safeAtob } from '../../../features/base64.js';
+import { V2RAY_SCHEMES } from '../../../features/UnifiedNode.js';
 import z from 'zod/v4';
 
-const SUPPORTED_PROTOCOLS = [
-  'vmess://',
-  'vless://',
-  'ss://',
-  'trojan://',
-  'socks://',
-  'hysteria2://',
-  'tuic://',
-];
-
 const schema = z.string().refine(
-  (link) => SUPPORTED_PROTOCOLS.some(proto => link.startsWith(proto)));
+  (link) => V2RAY_SCHEMES.some(proto => link.startsWith(proto)));
 
 /**
  * 解析基于 Base64 编码的订阅，每行一个节点。
@@ -38,6 +29,7 @@ export default function parseV2ray(subStr) {
 
   const lines = config
     .split(/\r?\n/)
+    .filter(line => line.trim())
     .map(line => line.trim())
     .flatMap(line => {
       const result = schema.safeParse(line);

@@ -1,6 +1,6 @@
 import * as Responses from './src/utils/response.js';
 import Logger from './src/features/logger.js';
-import { ProxyNodeSchema } from './src/features/UnifiedNode.js';
+import { ProxyNodeSchema, V2RAY_SCHEMES } from './src/features/UnifiedNode.js';
 import { generateBrowserHeaders } from './src/features/headers.js';
 import { isBase64, safeAtob } from './src/features/base64.js';
 import handleStaticRequest from './src/handlers/static.js';
@@ -59,7 +59,6 @@ function identifySubType(rawContent) {
   } catch (error) {};
 
   // 尝试解析为 V2Ray/Xray
-  const V2RAY_SCHEMES = ['vmess://', 'vless://', 'ss://', 'hysteria2://', 'trojan://', 'trojan-go://', 'socks://', 'tuic://', 'wireguard://'];
   const lines = content.trim().split(/\r?\n/);
   for (const line of lines) {
     const trimmedLine = line.trim();
