@@ -1,5 +1,13 @@
 import z from 'zod/v4';
 
+const ciphers = [
+  'auto',
+  'none',
+  'zero',
+  'aes-128-gcm',
+  'chacha20-poly1305',
+];
+
 /**
 * TLS 配置 Schema
 */
@@ -75,7 +83,7 @@ const VmessNodeSchema = BaseNodeSchema.extend({
   type: z.literal('vmess'),
   uuid: z.string(),
   alterId: z.number().int().min(0).default(0),
-  cipher: z.string().default('auto'),
+  cipher: z.enum(ciphers).default('auto'),
   packetEncoding: z.enum(['xudp', 'packetaddr', '']).optional(),
   globalPadding: z.boolean().optional(),
   authenticatedLength: z.boolean().optional(),
@@ -107,7 +115,7 @@ const Hysteria2NodeSchema = BaseNodeSchema.extend({
 
 const ShadowsocksNodeSchema = BaseNodeSchema.extend({
   type: z.literal('ss'),
-  cipher: z.string().describe('加密方式'),
+  cipher: z.string().default('aes-128-gcm').describe('加密方式'),
   password: z.string().describe('密码'),
 });
 
