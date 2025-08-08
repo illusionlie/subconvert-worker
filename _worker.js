@@ -5,7 +5,7 @@ import { generateBrowserHeaders } from './src/features/headers.js';
 import { isBase64, safeAtob } from './src/features/base64.js';
 import handleStaticRequest from './src/handlers/static.js';
 import handleSubParse from './src/handlers/subParser/index.js';
-import handleNodeParse from './src/handlers/nodeParser/index.js';
+import handleNodesParse from './src/handlers/nodeParser/index.js';
 import handleGenerateSub from './src/handlers/nodeGenerator/index.js';
 import YAML from 'js-yaml';
 
@@ -134,7 +134,7 @@ export default {
         logger.info('Parsed nodes', { nodeCount: parsedNodes.length });
 
         // 将节点解析到统一模板
-        const { nodes: unifiedNodes, nodeCounter, convertCounter } = handleNodeParse(parsedNodes, subType);
+        const { nodes: unifiedNodes, nodeCounter, convertCounter } = handleNodesParse(parsedNodes, subType);
         if (!unifiedNodes) return Responses.sub('Failed to parse nodes', 500);
         logger.info('Unified nodes', { nodeCounter, convertCounter });
         

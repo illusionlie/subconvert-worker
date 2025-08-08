@@ -16,7 +16,7 @@ const parserNodeRegistry = {
  * @param {string} subType - 识别出的订阅类型 (e.g., 'clash', 'v2ray')
  * @returns {Array<string|object>} - 解析出的节点数组。可能是字符串，也可能是对象。
  */
-export default function handleNodeParse(subStr, subType) {
+export default function handleNodesParse(subStr, subType) {
   const parser = parserNodeRegistry[subType];
 
   if (!parser) {
