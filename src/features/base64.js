@@ -4,11 +4,20 @@
  * @returns {boolean} 
  */
 export function isBase64(str) {
-    try {
-        return safeBtoa(safeAtob(str)) == str;
-    } catch (err) {
-        return false;
-    }
+  if (typeof str !== 'string') return false;
+  const s = str.replace(/\s+/g, '');
+  if (s.length === 0 || s.length % 4 !== 0) return false;
+  if (!/^[A-Za-z0-9+/]+={0,2}$/.test(s)) return false;
+
+  try {
+    const bin = atob(s);
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    // 遇到非法 UTF‑8 抛错
+    new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    return true;
+  } catch {
+    return false;
+  }
 
 }
 
@@ -18,9 +27,9 @@ export function isBase64(str) {
  * @returns {string}
  */
 export function safeBtoa(str) {
-    const utf8Bytes = new TextEncoder().encode(str);
-    const binaryString = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
-    return btoa(binaryString);
+  const utf8Bytes = new TextEncoder().encode(str);
+  const binaryString = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
+  return btoa(binaryString);
 }
 
 /**
@@ -29,7 +38,7 @@ export function safeBtoa(str) {
  * @returns {string}
  */
 export function safeAtob(str) {
-    const binaryString = atob(str);
-    const utf8Bytes = Uint8Array.from(binaryString, char => char.charCodeAt(0));
-    return new TextDecoder().decode(utf8Bytes);
+  const binaryString = atob(str);
+  const utf8Bytes = Uint8Array.from(binaryString, char => char.charCodeAt(0));
+  return new TextDecoder().decode(utf8Bytes);
 }
