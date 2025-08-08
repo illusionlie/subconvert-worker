@@ -67,7 +67,7 @@ function parseNode(node) {
       case 'h2': {
         standardNode.network = {
           type: 'h2',
-          host: node['h2-opts']?.host ?? '',
+          host: [node['h2-opts']?.host] || [],
           path: node['h2-opts']?.path ?? '',
         };
         break;
