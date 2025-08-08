@@ -21,10 +21,15 @@ const schema = z.object({
 export default function parseClash(subStr) {
   let config;
 
+  // 解析 YAML
   try {
     config = YAML.load(subStr);
   } catch (err) {
     throw new Error('Failed to parse Clash subscription: ' + err);
+  }
+
+  if (!config.proxies) {
+    throw new Error('Failed to parse Clash subscription: No proxies found');
   }
 
   const result = schema.safeParse(config);
@@ -33,7 +38,7 @@ export default function parseClash(subStr) {
   }
 
   const filteredResult = result.data.proxies.filter(proxy =>
-    SUPPORTED_PROTOCOLS.has(proxy.type)
+    SUPPORTED_PROTOCOLS.has((proxy.type).toLowerCase())
   );
   return filteredResult;
 }
