@@ -30,15 +30,6 @@ function identifySubType(rawContent) {
     return SubType.UNKNOWN;
   }
 
-  // 预处理，尝试 Base64 解码
-  const normalizedContent = rawContent.replace(/_/g, '/').replace(/-/g, '+');
-  let content = '';
-  if (isBase64(normalizedContent)) {
-    content = safeAtob(normalizedContent).trim();
-  } else {
-    content = rawContent.trim();
-  }
-
   // 尝试解析为 Sing-box (JSON)
   try {
     const data = JSON.parse(content);
@@ -118,9 +109,19 @@ export default {
         
         // 获取目标订阅
         const subresponse = await fetch(subUrl, { headers: requestHeaders });
-
         if (!subresponse.ok) return Responses.sub('Failed to fetch subscription', 500);
-        const subStr = await subresponse.text();
+
+        // 读取内容
+        const subText = await subresponse.text();
+
+        // 预处理 Base64
+        const normalizedContent = subText.replace(/_/g, '/').replace(/-/g, '+');
+        let subStr = '';
+        if (isBase64(normalizedContent)) {
+          content = safeAtob(normalizedContent).trim();
+        } else {
+          content = subText.trim();
+        }
 
         // 分辨订阅类型
         const subType = identifySubType(subStr);
