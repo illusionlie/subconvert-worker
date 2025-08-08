@@ -25,13 +25,15 @@ export default function parseClash(subStr) {
   try {
     config = YAML.load(subStr);
   } catch (err) {
-    throw new Error('Failed to parse Clash subscription: ' + err);
+    throw new Error('Failed to parse Clash subscription: Invalid YAML format');
   }
 
+  // 确保有 proxies
   if (!config.proxies) {
     throw new Error('Failed to parse Clash subscription: No proxies found');
   }
 
+  // 验证 schema
   const result = schema.safeParse(config);
   if (!result.success) {
     throw new Error(`Subscription schema validation failed: ${result.error.errors.map(e => `${e.path.join('.')} ${e.message}`).join(', ')}`);

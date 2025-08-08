@@ -18,12 +18,19 @@ const schema = z.object({
 export default function parseSingbox(subStr) {
   let config;
 
+  // 解析 JSON
   try {
     config = JSON.parse(subStr);
   } catch (err) {
-    throw new Error('Failed to parse subscription content: ' + err);
+    throw new Error('Failed to parse subscription content: Invalid JSON format');
   }
 
+  // 确保有 outbounds
+  if (!config.outbounds) {
+    throw new Error('Failed to parse subscription content: No outbounds found');
+  }
+
+  // 验证 schema
   const result = schema.safeParse(config);
   if (!result.success) {
     throw new Error(`Subscription schema validation failed: ${result.error.errors.map(e => `${e.path.join('.')} ${e.message}`).join(', ')}`);
