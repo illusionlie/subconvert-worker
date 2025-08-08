@@ -5,7 +5,7 @@ import parseV2rayNodes from './parsers/v2rayNodeParser.js';
 
 const parserNodeRegistry = {
   clash: parseClashNodes,
-  v2ray: (nodes) => parseV2rayNodes(Array.isArray(nodes) ? nodes.join('\n') : nodes),
+  v2ray: parseV2rayNodes,
   // 'sing-box': parseSingboxNode,
 };
 
