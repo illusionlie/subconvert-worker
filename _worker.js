@@ -22,11 +22,11 @@ const SubType = {
 
 /**
  * 识别订阅内容的类型
- * @param {string} rawContent - 从订阅链接获取的原始字符串内容。
+ * @param {string} content - 从订阅链接获取的字符串内容。
  * @returns {SubscriptionType} - 识别出的订阅类型。
  */
-function identifySubType(rawContent) {
-  if (!rawContent || typeof rawContent !== 'string' || rawContent.trim() === '') {
+function identifySubType(content) {
+  if (!content || typeof content !== 'string' || content.trim() === '') {
     return SubType.UNKNOWN;
   }
 
@@ -118,9 +118,9 @@ export default {
         const normalizedContent = subText.replace(/_/g, '/').replace(/-/g, '+');
         let subStr = '';
         if (isBase64(normalizedContent)) {
-          content = safeAtob(normalizedContent).trim();
+          subStr = safeAtob(normalizedContent).trim();
         } else {
-          content = subText.trim();
+          subStr = subText.trim();
         }
 
         // 分辨订阅类型
