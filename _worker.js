@@ -3,6 +3,7 @@ import Logger from './src/features/logger.js';
 import { ProxyNodeSchema } from './src/features/UnifiedNode.js';
 import { generateBrowserHeaders } from './src/features/headers.js';
 import { isBase64, safeAtob } from './src/features/base64.js';
+import handleStaticRequest from './src/handlers/static.js';
 import handleSubParse from './src/handlers/subParser/index.js';
 import handleNodeParse from './src/handlers/nodeParser/index.js';
 import handleGenerateSub from './src/handlers/nodeGenerator/index.js';
@@ -83,7 +84,9 @@ export default {
     const { pathname, searchParams, origin } = url;
     const logger = new Logger(request, env, ctx); // 初始化日志记录器
 
-	
+    const staticHandler = await handleStaticRequest(request, env, ctx);
+    if (staticHandler) return staticHandler;
+
     if (pathname.startsWith('/sub')) {
       // 订阅URL
       const subUrl = decodeURIComponent(searchParams.get('url'))  || '';
