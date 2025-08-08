@@ -37,5 +37,5 @@ export default function parseSingbox(subStr) {
   }
 
   const parsedConfig = result.data.outbounds;
-  return parsedConfig.filter(outbound => SUPPORTED_PROTOCOLS.has(outbound.type));
+  return parsedConfig.filter(outbound => SUPPORTED_PROTOCOLS.has((outbound.type).toLowerCase()));
 }
