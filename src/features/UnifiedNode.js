@@ -12,7 +12,7 @@ const TlsSchema = z.discriminatedUnion('enabled', [
       serverName: z.string().optional().describe('SNI (Server Name Indication)'),
       allowInsecure: z.boolean().default(false).describe('是否允许不安全连接 (例如自签名证书)'),
       alpn: z.array(z.string()).optional().describe('应用层协议协商 (h2, http/1.1)'),
-      fingerprint: z.enum(['chrome', 'firefox', 'safari', 'ios', 'random', 'randomized']).default('chrome').describe('TLS 指纹 (uTLS)'),
+      fingerprint: z.enum(['chrome', 'firefox', 'safari', 'ios', 'android', 'edge', '360', 'qq', 'random', 'randomized']).default('chrome').describe('TLS 指纹 (uTLS)'),
       // REALITY 配置
       reality: z.object({
           publicKey: z.string().describe('REALITY public key'),
