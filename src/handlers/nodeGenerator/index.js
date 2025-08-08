@@ -1,10 +1,12 @@
 import * as Responses from '../../utils/response.js';
 import generateClash from './generators/clashGenerator.js';
 import v2rayGenerator from './generators/v2rayGenerator.js';
+import singboxGenerator from './generators/singboxGenerator.js';
 
 const generatorRegistry = {
   clash: generateClash,
   v2ray: v2rayGenerator,
+  singbox: singboxGenerator,
 };
 
 /**
