@@ -106,6 +106,14 @@ export default {
 
         // 生成请求头
         const requestHeaders = generateBrowserHeaders(ua);
+
+        // 读取缓存
+        const cache = caches.default;
+        const cachedResponse = await cache.match(subUrl);
+        if (cachedResponse) {
+          logger.info('Found cached response, returning early');
+          return cachedResponse;
+        }
         
         // 获取目标订阅
         const subresponse = await fetch(subUrl, { headers: requestHeaders });
