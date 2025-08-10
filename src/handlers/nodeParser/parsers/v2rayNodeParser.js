@@ -89,7 +89,7 @@ function parseVmess(node) {
           headers: config.host ? { Host: config.host } : {},
         },
         h2: {
-          host: [config.host] || [],
+          host: config.host ? [config.host] : [],
           path: config.path || '',
         },
         grpc: {
