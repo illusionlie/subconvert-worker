@@ -198,7 +198,7 @@ function createProxyGroups(nodeNames) {
  * @returns {object} - Clash 规则提供者配置对象
  */
 function createRuleProviders() {
-  const rulePath = '/etc/clash/ruleset/';
+  const rulePath = './ruleset/';
   const baseRepo = 'https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/';
 
   const createProvider = (name, type, behavior) => ({
