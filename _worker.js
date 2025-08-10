@@ -186,7 +186,9 @@ export default {
           contentType = 'text/plain; charset=utf-8';
         }
 
-        return Responses.normal(generatedSub, 200, {}, contentType);
+        const finalResponse = Responses.normal(generatedSub, 200, {}, contentType);
+        ctx.waitUntil(cache.put(subUrl, finalResponse.clone())); // 异步写入缓存
+        return finalResponse;
 
       } catch (err) {
         console.error(err);
