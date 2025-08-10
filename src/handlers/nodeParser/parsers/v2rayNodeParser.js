@@ -39,7 +39,7 @@ function buildNetworkConfig(params) {
   return {
     type: params.get('type') || 'tcp',
     ws: {
-      path: params.get('path') || '',
+      path,
       headers: host ? { Host: host } : {},
     },
     h2: {

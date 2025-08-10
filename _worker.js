@@ -78,27 +78,28 @@ export default {
     if (staticHandler) return staticHandler;
 
     if (pathname.startsWith('/sub')) {
-      // 订阅URL
-      const subUrl = decodeURIComponent(searchParams.get('url'))  || '';
-      // 目标订阅类型
-      const target = searchParams.get('target').toLowerCase() || '';
-      // User-Agent
-      const ua = searchParams.get('ua') || 'default';
-      // 测试模式
-      const testOnly = searchParams.get('testOnly') || 'false';
-      // 严格模式
-      const strict = searchParams.get('strict') || 'false';
-
-      logger.info('Received subscription conversion request', {
-        subUrl,
-        target,
-        ua,
-        testOnly,
-        strict,
-      });
-
-      if (!subUrl || !target) return Responses.sub('Invalid request, missing url or target', 400);
       try {
+        // 订阅URL
+        const subUrl = decodeURIComponent(searchParams.get('url') || '');
+        // 目标订阅类型
+        const target = searchParams.get('target')?.toLowerCase() || '';
+        // User-Agent
+        const ua = searchParams.get('ua') || 'default';
+        // 测试模式
+        const testOnly = searchParams.get('testOnly') || 'false';
+        // 严格模式
+        const strict = searchParams.get('strict') || 'false';
+
+        logger.info('Received subscription conversion request', {
+          subUrl,
+          target,
+          ua,
+          testOnly,
+          strict,
+        });
+
+        if (!subUrl || !target) return Responses.sub('Invalid request, missing url or target', 400);
+
         // 判断 target 是否支持
         if (!Object.values(SubType).includes(target)) {
           return Responses.sub('Unsupported target type', 400);
