@@ -53,7 +53,7 @@ function generateVmess(node) {
       config.path = node.network.ws?.path || '/';
       break;
     case 'h2':
-      config.host = node.network.h2?.host || node.server;
+      config.host = node.network.h2?.host[0] || node.server;
       config.path = node.network.h2?.path || '/';
       break;
     case 'grpc':
