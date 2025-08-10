@@ -175,7 +175,7 @@ function parseHysteria2(node) {
       down: Number(params.get('down')) || 0,
       obfs: {
         type: params.get('obfs') || '',
-        obfsPassword: params.get('obfs-password') || '',
+        password: params.get('obfs-password') || '',
       },
       tls: {
         ...commonTlsParams,
