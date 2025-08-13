@@ -49,17 +49,17 @@ function generateVmess(node) {
   // 处理传输层配置
   switch (config.net) {
     case 'ws':
-      config.host = node.network.ws?.headers?.Host || node.server;
+      config.host = node.network?.headers?.Host || node.server;
       config.path = node.network.ws?.path || '/';
       break;
     case 'h2':
-      config.host = node.network.h2?.host[0] || node.server;
-      config.path = node.network.h2?.path || '/';
+      config.host = node.network?.host[0] || node.server;
+      config.path = node.network?.path || '/';
       break;
     case 'grpc':
       // V2Ray 客户端通常使用 path 字段来承载 gRPC 的 serviceName
-      config.path = node.network.grpc?.serviceName || '';
-      config.type = node.network.grpc?.type === 'multi' ? 'multi' : 'gun'; // 默认gun
+      config.path = node.network?.serviceName || '';
+      config.type = node.network?.type === 'multi' ? 'multi' : 'gun'; // 默认gun
       break;
     }
 
